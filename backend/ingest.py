@@ -18,7 +18,7 @@ from db import init_db, insert_content, clear_content
 
 CHUNK_SIZE = 600       # palabras por chunk (conservador para embeddings)
 CHUNK_OVERLAP = 50    # palabras de solape entre chunks
-VALID_DOMAINS = {"medicina", "supervivencia", "historia", "mapas"}
+VALID_DOMAINS = {"medicina", "supervivencia", "historia", "mapas", "electronica", "manufactura", "comunicaciones"}
 
 
 def parse_frontmatter(post):
