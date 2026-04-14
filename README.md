@@ -10,7 +10,7 @@
 <div align="center">
 
 ![Estado](https://img.shields.io/badge/Estado-Desarrollo-ff6b00?style=flat-square&labelColor=374151)
-![Versión](https://img.shields.io/badge/Versión-0.7.1-2563eb?style=flat-square&labelColor=374151)
+![Versión](https://img.shields.io/badge/Versión-0.7.2-2563eb?style=flat-square&labelColor=374151)
 ![Paradigma](https://img.shields.io/badge/Paradigma-Offline%20First-f97316?style=flat-square&labelColor=374151)
 ![IA](https://img.shields.io/badge/IA-Ollama%20%2B%20Voz%20Offline-7c3aed?style=flat-square&labelColor=374151)
 ![Hardware](https://img.shields.io/badge/Hardware-Raspberry%20Pi%20%2F%20PC-ec4899?style=flat-square&labelColor=374151)
@@ -163,7 +163,35 @@ Endpoints de audio en la API:
 | POST | `/audio/stt` | Recibe audio WAV/MP3, retorna texto |
 | GET | `/audio/tts?q=` | Recibe texto, retorna audio WAV |
 
-Requerimientos: `whisper` (STT) y `mlx-audio` (TTS) instalados localmente.
+
+### Mapas offline
+
+Alexandria incluye un visualizador de mapas que funciona sin conexión:
+
+```bash
+# 1. Descarga las librerías (MapLibre GL + PMTiles)
+python scripts/setup_maps_libs.py
+
+# 2. Descarga regiones en formato PMTiles
+python scripts/download_pmtiles.py --region chile      # Chile
+python scripts/download_pmtiles.py --region sudamerica  # Sudamérica
+python scripts/download_pmtiles.py --list               # Ver todas
+
+# 3. Accede desde Alexandria
+# Abre http://localhost:8080/maps
+```
+
+Regiones disponibles para descarga:
+
+| Región | Archivo | Descripción |
+|---|---|---|
+| Chile | `chile.pmtiles` | Chile continental + insular |
+| Sudamérica | `sudamerica.pmtiles` | Continente completo |
+| Latinoamérica | `latam.pmtiles` | México a Argentina |
+| Europa | `europa.pmtiles` | Continente europeo |
+| Mundo | `world.pmtiles` | Mapa mundial general |
+
+Los mapas se sirven desde `data/maps/` y se accede via `/maps`. No requieren conexión a Internet una vez descargados.
 
 ## Uso
 
@@ -210,6 +238,8 @@ Alexandria expone una API REST en `http://localhost:8080`:
 | GET | `/search?q=&domain=&limit=` | Búsqueda full-text |
 | GET | `/content/<id>` | Contenido completo de un artículo |
 | GET | `/content/<id>/images` | Imágenes asociadas al artículo |
+| GET | `/maps` | Visualizador de mapas offline |
+| GET | `/maps/available` | Lista mapas offline descargados |
 | POST | `/chat` | Chat con contexto recuperado |
 | POST | `/audio/stt` | Transcribe audio a texto (Whisper) |
 | GET | `/audio/tts?q=` | Sintetiza texto a audio (mlx-audio) |
@@ -306,7 +336,6 @@ Alexandria consume ~50MB de código. Es el proyecto más ligero orientado a auto
 - [x] Dockerización (un solo comando)
 
 ### En progreso
-- [ ] Mapas offline (PMTiles + MapLibre GL, un solo archivo HTML)
 - [ ] Indexación incremental (watch mode con inotify/FSEvents)
 ### Completado
 - [x] Pipeline de descarga masiva de Wikipedia (ZIM)
@@ -315,6 +344,7 @@ Alexandria consume ~50MB de código. Es el proyecto más ligero orientado a auto
 - [x] Voz offline (STT con Whisper + TTS con mlx-audio)
 - [x] Frontend con interfaz de voz (micrófono + altavoz)
 - [x] Imágenes inline en artículos (figcaption, galería, lightbox)
+- [x] Mapas offline (PMTiles + MapLibre GL, un solo archivo HTML)
 
 
 
