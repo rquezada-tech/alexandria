@@ -1,5 +1,5 @@
 #!/bin/bash
-# Alexandria - Script de inicio
+# Alexandria - Script de inicio (modo desarrollo/nativo)
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -7,11 +7,17 @@ cd "$SCRIPT_DIR"
 
 echo "Iniciando Alexandria..."
 
-# 1. Verificar que Ollama esté corriendo
-if ! curl -s http://localhost:11434/api/tags > /dev/null 2>&1; then
-  echo "ADVERTENCIA: Ollama no está corriendo en localhost:11434"
-  echo "Inicia Ollama con: ollama serve"
-  echo ""
+# 0. Detectar si estamos dentro de Docker
+# Si es así, el entrypoint de Docker ya arranca Ollama
+if [ -f "/.dockerenv" ] || [ -n "$IN_DOCKER" ]; then
+  echo "[Docker] Entorno Docker detectado — skip Ollama check."
+else
+  # 1. Verificar que Ollama esté corriendo
+  if ! curl -s http://localhost:11434/api/tags > /dev/null 2>&1; then
+    echo "ADVERTENCIA: Ollama no está corriendo en localhost:11434"
+    echo "Inicia Ollama con: ollama serve"
+    echo ""
+  fi
 fi
 
 # 2. Crear carpeta data si no existe
