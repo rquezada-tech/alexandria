@@ -8,9 +8,8 @@ cd "$SCRIPT_DIR"
 echo "Iniciando Alexandria..."
 
 # 0. Detectar si estamos dentro de Docker
-# Si es así, el entrypoint de Docker ya arranca Ollama
 if [ -f "/.dockerenv" ] || [ -n "$IN_DOCKER" ]; then
-  echo "[Docker] Entorno Docker detectado — skip Ollama check."
+  echo "[Docker] Entorno Docker detectado."
 else
   # 1. Verificar que Ollama esté corriendo
   if ! curl -s http://localhost:11434/api/tags > /dev/null 2>&1; then
@@ -20,28 +19,48 @@ else
   fi
 fi
 
-# 2. Crear carpeta data si no existe
-mkdir -p data
+# 2. Verificar herramientas de audio
+echo "--- Capacidades de audio ---"
+if command -v whisper &> /dev/null; then
+  WHISPER_MODEL=${WHISPER_MODEL:-medium}
+  echo "  STT (Whisper): OK ($WHISPER_MODEL)"
+else
+  echo "  STT (Whisper): NO instalado (brew install whisper)"
+fi
 
-# 3. Verificar que existe contenido
+if command -v mlx-audio &> /dev/null; then
+  VOICE=${TTS_VOICE:-af_heart}
+  echo "  TTS (mlx-audio): OK (voz: $VOICE)"
+else
+  echo "  TTS (mlx-audio): NO instalado (github.com/lucasnewman/mlx-audio)"
+fi
+
+# 3. Crear carpeta data si no existe
+mkdir -p data/audio
+
+# 4. Verificar contenido
 if [ ! -d "content" ] || [ -z "$(ls -A content 2>/dev/null)" ]; then
+  echo ""
   echo "ADVERTENCIA: No hay contenido en content/. Ejecuta: python3 backend/ingest.py"
 fi
 
-# 4. Instalar dependencias si falta
+# 5. Instalar dependencias Python si falta
 if [ ! -f ".venv/bin/python" ]; then
+  echo ""
   echo "Creando entorno virtual..."
   python3 -m venv .venv
   .venv/bin/pip install -q -r requirements.txt
 fi
 
-# 5. Ingestar contenido fresco
+# 6. Ingestar contenido fresco
+echo ""
 echo "Verificando base de conocimiento..."
 .venv/bin/python backend/ingest.py --content content 2>/dev/null || true
 
-# 6. Iniciar API
+# 7. Iniciar API
+echo ""
 echo "Iniciando API en http://localhost:8080"
-echo "Abre http://localhost:8080/static/index.html para ver la interfaz"
+echo "Abre http://localhost:8080 para ver la interfaz"
 echo ""
 echo "Para detener: pkill -f 'uvicorn.*alexandria'"
 

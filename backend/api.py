@@ -1,17 +1,17 @@
 """
 Alexandria - API FastAPI
-Endpoints para búsqueda, chat y administración
+Endpoints para búsqueda, chat, administración y audio (STT + TTS)
 """
 import os
+import sys
 import uuid
-import json
 from pathlib import Path
 from typing import Optional
 
 import httpx
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, Response
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
@@ -28,6 +28,13 @@ from db import (
     get_stats,
     SearchResult,
 )
+from audio import (
+    transcribe_audio,
+    generate_speech,
+    is_whisper_available,
+    is_mlx_audio_available,
+    list_tts_voices,
+)
 
 # ── Config ──────────────────────────────────────────────
 DATA_DIR = sys_path / "data"
@@ -36,7 +43,7 @@ PORT = int(os.getenv("ALEXANDRIA_PORT", "8080"))
 OLLAMA_BASE = os.getenv("OLLAMA_BASE", "http://localhost:11434")
 
 # ── App ─────────────────────────────────────────────────
-app = FastAPI(title="Alexandria API", version="0.1.0")
+app = FastAPI(title="Alexandria API", version="0.2.0")
 
 app.add_middleware(
     CORSMiddleware,
@@ -46,13 +53,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ── Modelo de chat ──────────────────────────────────────
+# ── Modelos ──────────────────────────────────────────────
 class ChatRequest(BaseModel):
     question: str
     session_id: Optional[str] = None
     domain: Optional[str] = None
     model: Optional[str] = None
-    max_context: int = 5  # máximo de chunks de contexto
+    max_context: int = 5
 
 
 # ── Helpers ──────────────────────────────────────────────
@@ -106,8 +113,7 @@ def call_ollama(model: str, messages: list[dict]) -> str:
 
 
 def select_model() -> str:
-    """Selecciona el modelo más apropiado según RAM disponible (heurística simple)."""
-    # Intentar detectar memoria disponible
+    """Selecciona el modelo más apropiado según RAM disponible."""
     try:
         import psutil
         mem = psutil.virtual_memory()
@@ -121,10 +127,10 @@ def select_model() -> str:
         else:
             return "qwen2.5:3b"
     except ImportError:
-        return "qwen2.5:3b"  # fallback seguro
+        return "qwen2.5:3b"
 
 
-# ── Endpoints ───────────────────────────────────────────
+# ── Endpoints: Estado ───────────────────────────────────
 @app.on_event("startup")
 def startup():
     init_db()
@@ -132,7 +138,17 @@ def startup():
 
 @app.get("/health")
 def health():
-    return {"status": "ok", "version": "0.1.0"}
+    return {
+        "status": "ok",
+        "version": "0.2.0",
+        "audio": {
+            "stt_available": is_whisper_available(),
+            "tts_available": is_mlx_audio_available(),
+            "whisper_model": os.getenv("WHISPER_MODEL", "medium"),
+            "tts_voices": list_tts_voices(),
+            "tts_voice": os.getenv("TTS_VOICE", "af_heart"),
+        },
+    }
 
 
 @app.get("/domains")
@@ -145,6 +161,7 @@ def stats():
     return get_stats()
 
 
+# ── Endpoints: Búsqueda ─────────────────────────────────
 @app.get("/search")
 def search_endpoint(
     q: str = Query(..., min_length=2),
@@ -170,13 +187,12 @@ def search_endpoint(
     }
 
 
-@app.get("/content/<int:content_id>")
+@app.get("/content/{content_id}")
 def get_content(content_id: int):
     content = get_content_by_id(content_id)
     if not content:
         raise HTTPException(status_code=404, detail="Contenido no encontrado")
 
-    # Obtener todos los chunks del mismo artículo
     all_chunks = get_all_content_for_source(content.source)
 
     return {
@@ -191,12 +207,12 @@ def get_content(content_id: int):
     }
 
 
+# ── Endpoints: Chat ─────────────────────────────────────
 @app.post("/chat")
 def chat(req: ChatRequest):
     session_id = req.session_id or str(uuid.uuid4())
     model = req.model or select_model()
 
-    # 1. Recuperar contexto
     context, results = retrieve_context(req.question, req.domain, req.max_context)
 
     if not results:
@@ -207,21 +223,17 @@ def chat(req: ChatRequest):
             "model": model,
         }
 
-    # 2. Construir prompt con contexto
     system_msg = {
         "role": "system",
         "content": build_system_prompt(req.domain) + f"\n\nCONTEXTO RECUPERADO:\n{context}",
     }
-
     user_msg = {"role": "user", "content": req.question}
 
-    # 3. Llamar Ollama
     try:
         answer = call_ollama(model=model, messages=[system_msg, user_msg])
     except Exception as e:
         raise HTTPException(status_code=502, detail=f"Error al generar respuesta: {str(e)}")
 
-    # 4. Guardar en historial
     source_ids = [r.id for r in results]
     save_chat(
         session_id=session_id,
@@ -242,7 +254,7 @@ def chat(req: ChatRequest):
     }
 
 
-@app.get("/chat/history/<session_id>")
+@app.get("/chat/history/{session_id}")
 def chat_history(session_id: str, limit: int = Query(default=20, ge=1, le=100)):
     history = get_chat_history(session_id=session_id, limit=limit)
     return {
@@ -260,9 +272,120 @@ def chat_history(session_id: str, limit: int = Query(default=20, ge=1, le=100)):
     }
 
 
+# ── Endpoints: Audio (STT + TTS) ────────────────────────
+
+@app.post("/audio/stt")
+async def audio_stt(
+    audio: UploadFile = File(...),
+    language: str = Form(default="es"),
+):
+    """
+    Recibe un archivo de audio (WAV, MP3, M4A, OGG, FLAC)
+    y retorna la transcripción de texto.
+
+    Requiere: whisper instalado y modelo descargado.
+    """
+    if not is_whisper_available():
+        raise HTTPException(
+            status_code=503,
+            detail="Whisper no está instalado. Instálalo con: brew install whisper",
+        )
+
+    # Leer audio
+    try:
+        audio_bytes = await audio.read()
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Error al leer audio: {e}")
+
+    if len(audio_bytes) == 0:
+        raise HTTPException(status_code=400, detail="Archivo de audio vacío.")
+
+    # Limite: 50MB
+    if len(audio_bytes) > 50 * 1024 * 1024:
+        raise HTTPException(status_code=400, detail="Archivo de audio muy grande (máx 50MB).")
+
+    filename = audio.filename or "audio.wav"
+
+    try:
+        text = transcribe_audio(audio_bytes, filename, language=language)
+    except RuntimeError as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error en transcripción: {e}")
+
+    return {
+        "text": text,
+        "language": language,
+        "filename": filename,
+    }
+
+
+@app.get("/audio/tts")
+def audio_tts(
+    q: str = Query(..., min_length=1, max_length=2000),
+    voice: str = Query(default=None),
+):
+    """
+    Recibe texto y retorna audio WAV con voz sintetizada.
+
+    Requiere: mlx-audio instalado con Kokoro-82M.
+    """
+    if not is_mlx_audio_available():
+        raise HTTPException(
+            status_code=503,
+            detail=(
+                "mlx-audio no está instalado. Instálalo desde:\n"
+                "  https://github.com/lucasnewman/mlx-audio"
+            ),
+        )
+
+    active_voice = voice or os.getenv("TTS_VOICE", "af_heart")
+
+    try:
+        wav_bytes = generate_speech(q, voice=active_voice)
+    except RuntimeError as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error en síntesis de voz: {e}")
+
+    return Response(
+        content=wav_bytes,
+        media_type="audio/wav",
+        headers={
+            "Content-Disposition": f'attachment; filename="alexandria_voice.wav"',
+            "X-Voice": active_voice,
+        },
+    )
+
+
+@app.get("/audio/capabilities")
+def audio_capabilities():
+    """Lista las capacidades de audio del sistema."""
+    return {
+        "stt": {
+            "available": is_whisper_available(),
+            "cmd": os.getenv("WHISPER_CMD", "whisper"),
+            "model": os.getenv("WHISPER_MODEL", "medium"),
+        },
+        "tts": {
+            "available": is_mlx_audio_available(),
+            "cmd": os.getenv("MLX_AUDIO_CMD", "mlx-audio"),
+            "default_voice": os.getenv("TTS_VOICE", "af_heart"),
+            "voices": list_tts_voices(),
+        },
+    }
+
+
 # ── Frontend estático ───────────────────────────────────
-frontend_dir = sys_path / "frontend" / "dist"
+frontend_dir = sys_path / "frontend"
 if frontend_dir.exists():
+    @app.get("/")
+    def serve_index():
+        idx = frontend_dir / "index.html"
+        if idx.exists():
+            return FileResponse(str(idx))
+        raise HTTPException(status_code=404, detail="Frontend no encontrado")
+
     app.mount("/static", StaticFiles(directory=str(frontend_dir)), name="static")
 
 
