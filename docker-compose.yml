@@ -1,0 +1,74 @@
+# Alexandria - Docker Compose
+# Un solo comando: docker compose up
+#
+# Puertos:
+#   Alexandria API → http://localhost:8080
+#   Ollama         → http://localhost:11434  (opcional, para debugging)
+#
+# Modelos: cambia OLLAMA_MODEL en variables de entorno.
+# Por defecto qwen2.5:3b (funciona en 4GB RAM).
+#
+# Volúmenes:
+#   ./content → contenido de Alexandria (artículos Markdown)
+#   ./data    → base SQLite (persiste entre arranques)
+#
+# Para agregar contenido nuevo:
+#   1. Copia archivos .md a ./content/<dominio>/
+#   2. Reinicia: docker compose restart
+#
+version: "3.9"
+
+services:
+  alexandria:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: alexandria
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      - ALEXANDRIA_PORT=8080
+      - OLLAMA_BASE=http://ollama:11434
+      - OLLAMA_MODEL=${OLLAMA_MODEL:-qwen2.5:3b}
+      - LANG=C.UTF-8
+      - LC_ALL=C.UTF-8
+    volumes:
+      - ./content:/home/alexandria/content:ro
+      - alexandria-data:/home/alexandria/data
+    networks:
+      - alexandria-net
+    # Esperar a que Ollama esté listo antes de levantar la API
+    depends_on:
+      ollama:
+        condition: service_healthy
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: alexandria-ollama
+    restart: unless-stopped
+    ports:
+      - "11434:11434"
+    environment:
+      - OLLAMA_MODEL=${OLLAMA_MODEL:-qwen2.5:3b}
+      - OLLAMA_HOST=0.0.0.0
+    volumes:
+      - ollama-data:/root/.ollama
+    networks:
+      - alexandria-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+networks:
+  alexandria-net:
+    driver: bridge
+
+volumes:
+  alexandria-data:
+    driver: local
+  ollama-data:
+    driver: local
