@@ -10,7 +10,7 @@
 <div align="center">
 
 ![Estado](https://img.shields.io/badge/Estado-Desarrollo-ff6b00?style=flat-square&labelColor=374151)
-![Versión](https://img.shields.io/badge/Versión-0.7.4-2563eb?style=flat-square&labelColor=374151)
+![Versión](https://img.shields.io/badge/Versión-0.7.5-2563eb?style=flat-square&labelColor=374151)
 ![Paradigma](https://img.shields.io/badge/Paradigma-Offline%20First-f97316?style=flat-square&labelColor=374151)
 ![IA](https://img.shields.io/badge/IA-Ollama%20%2B%20Voz%20Offline-7c3aed?style=flat-square&labelColor=374151)
 ![Hardware](https://img.shields.io/badge/Hardware-Raspberry%20Pi%20%2F%20PC-ec4899?style=flat-square&labelColor=374151)
@@ -211,6 +211,35 @@ content/ebooks/MI_LIBRO/
 
 El lector incluye navegación por capítulos, tabla de contenidos, tipografía serif optimizada para lectura (Merriweather), drop cap, barra de progreso, temas (oscuro/claro/sepia) y ajustes de fuente. Funciona 100% offline.
 
+## Integración con Kolibri
+
+Alexandria puede importar contenido de canales Kolibri (Khan Academy, CK-12, PhET, etc.) y servirlo como artículos searcheables con la misma interfaz de siempre:
+
+```bash
+# 1. Descarga un canal .kolibri desde Kolibri Studio o desde un Kolibri existente
+#    (archivo .db o carpeta con content.db)
+
+# 2. Explorar el canal sin importar (solo lectura)
+python scripts/import_kolibri_channel.py --input ./mi_canal.kolibri --list
+
+# 3. Importar a content/ (convierte a .md con frontmatter kolibri)
+python scripts/import_kolibri_channel.py --input ./mi_canal.kolibri --output ./content
+
+# 4. Re-indexar (si no estás en modo --watch)
+python backend/watch.py --once
+```
+
+Channels importados generan:
+
+- Un artículo por cada recurso (video, documento, ejercicio, audio, HTML5)
+- Frontmatter con `domain: kolibri`, `source_channel`, `kolibri_id`, `kind`
+- Archivo índice en `content/kolibri/<canal>/00-INDICE.md`
+- Carpeta `_files/` para copiar manualmente los archivos binarios asociados
+
+> Los archivos grandes (videos, documentos) no se copian automáticamente por su tamaño.
+> Úsalos directamente desde Kolibri o cópialos manualmente a `_files/`.
+> Alexandria los referencia y los busca en texto para contexto de chat.
+
 ## Uso
 
 ### Agregar conocimiento nuevo
@@ -366,6 +395,7 @@ Alexandria consume ~50MB de código. Es el proyecto más ligero orientado a auto
 - [x] Mapas offline (PMTiles + MapLibre GL, un solo archivo HTML)
 - [x] Indexación incremental (watch mode con watchdog, re-index automático de content/)
 - [x] Lector de ebooks Markdown (usa el mismo content/ que artículos, navegación por capítulos)
+- [x] Integración con Kolibri (importa canales .kolibri como artículos con frontmatter kolibri)
 
 
 
@@ -382,7 +412,7 @@ Alexandria consume ~50MB de código. Es el proyecto más ligero orientado a auto
 - Sistema de autenticación / multi-usuario
 - Base de datos vectorial (Qdrant, Chroma, etc.)
 - Más contenedores Docker además de Alexandria + Ollama
-- Kolibri / Khan Academy (herramientas educativas separadas)
+# ~ Kolibri / Khan Academy (integrado via import_kolibri_channel.py)
 - CyberChef embebido
 - FlatNotes u otra app de notas separada
 - Command Center con panel de control complejo
