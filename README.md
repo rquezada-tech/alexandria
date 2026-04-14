@@ -276,16 +276,16 @@ No se usa ChromaDB, Pinecone, ni ningún servicio externo. La base de conocimien
 
 ## Diferencia con otros proyectos
 
-| Característica | Alexandria | refugiOS | civilization_node | AnythingLLM | N.O.M.A.D. |
-|---|---|---|---|---|---|---|
-| Contenedores extra | 0 | 1 | 1 | 3+ | 7+ |
-| Base vectorial | No | No | Sí | Chroma | Qdrant |
-| Servicios intermedios | No | ZIM reader | Open WebUI + Docker | Redis + Node | MySQL + varios |
-| Offline completo | Sí | Sí | Solo IA | No | Sí |
-| Instalación | `docker compose up` | Varios pasos | Docker | `docker run` | `curl \| bash` |
-| Hardware mínimo | 2GB RAM | 8GB RAM | 12GB RAM | 4GB RAM | 8GB RAM+ |
-| Contenido custom | Fácil (.md) | Complejo | Complejo | Fácil | Medio |
-| Líneas de código | ~50MB | ~1GB | ~5GB | ~2GB | ~7GB tooling |
+| **Característica**       | **Alexandria** | **refugiOS** | **civilization_node** | **AnythingLLM** | **N.O.M.A.D.** |
+|---------------------------|----------------|---------------|------------------------|-----------------|----------------|
+| **Contenedores extra**    | 0              | 1             | 1                      | 3+              | 7+              |
+| **Base vectorial**        | No             | No            | Sí                     | Chroma          | Qdrant          |
+| **Servicios intermedios** | No             | ZIM reader    | Open WebUI + Docker    | Redis + Node    | MySQL + varios  |
+| **Offline completo**      | Sí             | Sí            | Solo IA                | No              | Sí              |
+| **Instalación**           | `docker compose up` | Varios pasos | Docker                | `docker run`    | `curl \| bash`  |
+| **Hardware mínimo**       | 2GB RAM        | 8GB RAM       | 12GB RAM              | 4GB RAM         | 8GB RAM+        |
+| **Contenido custom**      | Fácil (.md)    | Complejo      | Complejo              | Fácil           | Medio           |
+| **Líneas de código**      | ~50MB          | ~1GB          | ~5GB                  | ~2GB            | ~7GB tooling    |
 
 Alexandria consume ~50MB de código. Es el proyecto más ligero orientado a autonomía real.
 
