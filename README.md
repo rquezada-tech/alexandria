@@ -242,6 +242,8 @@ alexandria/
 
 Alexandria usa:
 
+> **Filosofía:** Alexandria es un solo proceso Python + una base SQLite. No usa contenedores adicionales, bases vectoriales, ni servicios intermedios. Cada línea de código debe justificar su existencia.
+
 - **SQLite + FTS5** — base de datos single-file con búsqueda full-text embebida
 - **Chunking semántico** — cada artículo se divide en chunks de ~600 palabras con overlap
 - **BM25 ranking** — recuperación por relevancia sobre FTS5 (sin vector DB externa)
@@ -252,25 +254,46 @@ No se usa ChromaDB, Pinecone, ni ningún servicio externo. La base de conocimien
 
 ## Diferencia con otros proyectos
 
-| Característica | Alexandria | refugiOS | civilization_node | AnythingLLM |
-|---|---|---|---|---|
-| Single-file DB | SQLite FTS5 | ZIM + separado | Vector DB | Vector DB |
-| Sin Docker | Sí | No | No | Sí |
-| Sin servicios intermedios | Sí | ZIM reader | Open WebUI + Docker | Node.js |
-| Contenido consolidado | Sí (un DB) | Separado (wiki/IA/map) | Wikipedia (ZIM) | Docs propios |
-| Contenido custom | Fácil (.md) | Complejo | Complejo | Fácil |
-| Hardware mínimo | 2GB RAM | 8GB RAM | 12GB RAM | 4GB RAM |
+| Característica | Alexandria | Project N.O.M.A.D. | AnythingLLM |
+|---|---|---|---|
+| Contenedores extra | 0 | 7+ | 3+ |
+| Base vectorial | No | Qdrant | Chroma |
+| Servicios intermedios | No | MySQL + varios | Redis + varios |
+| Instalación | `docker compose up` | `curl \| bash` | `docker run` |
+| Hardware mínimo | 2GB RAM | 8GB RAM+ | 4GB RAM |
+| Offline completo | Sí | Sí | Sí |
+| Líneas de código | ~50MB | ~7GB tooling | ~2GB |
+
+Alexandria consume ~50MB de código Python. N.O.M.A.D. requiere ~7GB de herramientas.
 
 ## Roadmap
 
 - [x] Pipeline de descarga masiva de Wikipedia (ZIM)
 - [x] 125,000+ artículos de Wikipedia ingestados
 - [x] Dockerización (un solo comando)
-- [ ] Soporte para imágenes inline en artículos
-- [ ] Mapas offline (Organic Maps)
-- [ ] Indexación incremental (watch mode)
-- [ ] Exportar/importar base de conocimiento
-- [ ] Métricas de calidad del contenido
+
+### En progreso
+- [ ] Imágenes inline en artículos (figcaption, galerías ligeras)
+- [ ] Mapas offline (PMTiles + MapLibre GL, un solo archivo HTML)
+- [ ] Indexación incremental (watch mode con inotify/FSEvents)
+
+### Próximos
+- [ ] Exportar / importar base (zip: .db + content/)
+- [ ] Métricas de calidad de artículos (completitud, enlaces internos)
+- [ ] UI mejorada: dark mode, búsqueda avanzada, render de markdown
+- [ ] Lector de ebooks Markdown (usa el mismo content/ que artículos)
+- [ ] CLI de gestión (`alexandria-cli` para ingestar, exportar, diagnosticar)
+- [ ] Script de upgrade: `curl | bash` para actualizar desde GitHub
+- [ ] Sync de contenido via filesystem (copiar carpeta content/ por USB)
+
+### No planeados (van contra la misión de ser ligero)
+- Sistema de autenticación / multi-usuario
+- Base de datos vectorial (Qdrant, Chroma, etc.)
+- Más contenedores Docker además de Alexandria + Ollama
+- Kolibri / Khan Academy (herramientas educativas separadas)
+- CyberChef embebido
+- FlatNotes u otra app de notas separada
+- Command Center con panel de control complejo
 
 ---
 
