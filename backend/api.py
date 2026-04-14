@@ -44,7 +44,7 @@ PORT = int(os.getenv("ALEXANDRIA_PORT", "8080"))
 OLLAMA_BASE = os.getenv("OLLAMA_BASE", "http://localhost:11434")
 
 # ── App ─────────────────────────────────────────────────
-app = FastAPI(title="Alexandria API", version="0.3.1")
+app = FastAPI(title="Alexandria API", version="0.3.2")
 
 app.add_middleware(
     CORSMiddleware,
@@ -185,7 +185,7 @@ def startup():
 def health():
     return {
         "status": "ok",
-        "version": "0.3.1",
+        "version": "0.3.2",
         "audio": {
             "stt_available": is_whisper_available(),
             "tts_available": is_mlx_audio_available(),

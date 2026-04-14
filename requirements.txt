@@ -7,3 +7,4 @@ tqdm==4.*
 pydantic==2.*
 psutil==5.*
 python-multipart==0.0.20
+watchdog==5.0.3
