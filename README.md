@@ -77,6 +77,69 @@ ollama pull qwen3:14b            # o el modelo que prefieras
 
 Abre **http://localhost:8080/static/index.html** en tu navegador.
 
+
+## Docker (un solo comando)
+
+La forma más rápida de correr Alexandria:
+
+```bash
+# 1. Clona y entra al directorio
+git clone https://github.com/rquezada-tech/alexandria.git
+cd alexandria
+
+# 2. Copia tu contenido (opcional — sin contenido igualmente funciona)
+# cp tu_contenido/*.md content/medicina/
+
+# 3. Arranca todo (API + Ollama + contenido)
+docker compose up
+```
+
+Abre **http://localhost:8080/static/index.html**
+
+### Modelos disponibles
+
+Por defecto usa `qwen2.5:3b` (~2GB). Para cambiar el modelo:
+
+```bash
+OLLAMA_MODEL=qwen3:14b docker compose up --build
+```
+
+Modelos compatibles (requieren más RAM):
+
+| Modelo | RAM mínima | Notas |
+|---|---|---|
+| `qwen2.5:3b` | 4 GB | Por defecto |
+| `phi4-mini` | 4 GB | Buena calidad, rápido |
+| `qwen2.5:7b` | 8 GB | Mejor calidad |
+| `qwen3:8b` | 12 GB | Excelente razonamiento |
+| `qwen3:14b` | 16 GB | Máxima calidad |
+
+### Agregar contenido
+
+```bash
+# Copia archivos Markdown a content/
+cp mis_articulos/*.md content/medicina/
+
+# Reinicia para que se re-ingeste
+docker compose restart
+```
+
+### Con Ollama externo (avanzado)
+
+Si ya tienes Ollama corriendo en otra máquina:
+
+```yaml
+# docker-compose.override.yml
+services:
+  alexandria:
+    environment:
+      - OLLAMA_BASE=http://tu-ip:11434
+    depends_on: []   # Quitar dependencia de ollama
+  ollama:
+    image: tainer
+```
+
+
 ## Uso
 
 ### Agregar conocimiento nuevo
@@ -202,7 +265,7 @@ No se usa ChromaDB, Pinecone, ni ningún servicio externo. La base de conocimien
 
 - [x] Pipeline de descarga masiva de Wikipedia (ZIM)
 - [x] 125,000+ artículos de Wikipedia ingestados
-- [ ] Dockerización (un solo comando)
+- [x] Dockerización (un solo comando)
 - [ ] Soporte para imágenes inline en artículos
 - [ ] Mapas offline (Organic Maps)
 - [ ] Indexación incremental (watch mode)
