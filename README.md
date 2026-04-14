@@ -34,17 +34,22 @@ Está diseñada para:
 
 ## Dominios de conocimiento
 
-| Dominio | Contenido | Artículos |
-|---|---|---:|
-| Medicina | Primeros auxilios, salud básica | 3 |
-| Historia | Civilizaciones, geografía | 2 |
-| Manufactura | Química, física, matemáticas | 3,609 |
-| Electrónica | Computación, componentes, DIY | 4 |
-| Supervivencia | Agua, refugio, fuego, orientación, fauna | 11 |
-| Herramientas | Fabricación, reparación, nudos | 4 |
-| Comunicaciones | Radio FM, Morse, antenas | 1 |
+> **Al ejecutar `docker compose up` se descarga automáticamente Wikipedia completo (~125,000 artículos)** via pipeline ZIM. La columna "Repo" muestra solo lo que está en el repositorio; la columna "Docker" muestra el total disponible al instante.
 
-El contenido se expande agregando archivos `.md` a la carpeta `content/`.
+| Dominio | Contenido | Repo | Docker |
+|---|---|---:|---:|
+| Medicina | Primeros auxilios, salud básica | 3 | 31,342 |
+| Historia | Civilizaciones, geografía, eventos | 2 | 32,057 |
+| Manufactura | Química, física, matemáticas | 3,609 | 34,308 |
+| Electrónica | Computación, componentes, DIY | 4 | 28,205 |
+| Supervivencia | Agua, refugio, fuego, orientación, fauna, nudos | 11 | 11 |
+| Herramientas | Fabricación, reparación, nudos | 4 | 4 |
+| Comunicaciones | Radio FM, Morse, antenas | 1 | 1 |
+| **Mapas offline** | Chile, Sudamérica, Latinoamérica, Europa, Mundo | 0 | 5 regiones |
+
+**Total repo:** 24 artículos en texto. **Total Docker:** ~126,000 artículos + 5 regiones de mapas.
+
+El contenido se expande agregando archivos `.md` a la carpeta `content/`. Los artículos nuevos se indexan automáticamente al reiniciar.
 
 ## Requisitos
 
