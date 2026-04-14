@@ -282,10 +282,13 @@ No se usa ChromaDB, Pinecone, ni ningún servicio externo. La base de conocimien
 | **Base vectorial**        | No             | No            | Sí                     | Chroma          | Qdrant          |
 | **Servicios intermedios** | No             | ZIM reader    | Open WebUI + Docker    | Redis + Node    | MySQL + varios  |
 | **Offline completo**      | Sí             | Sí            | Solo IA                | No              | Sí              |
+| **Voz offline (STT+TTS)**| Sí             | No            | No                     | No              | No              |
 | **Instalación**           | `docker compose up` | Varios pasos | Docker                | `docker run`    | `curl \| bash`  |
 | **Hardware mínimo**       | 2GB RAM        | 8GB RAM       | 12GB RAM              | 4GB RAM         | 8GB RAM+        |
 | **Contenido custom**      | Fácil (.md)    | Complejo      | Complejo              | Fácil           | Medio           |
 | **Líneas de código**      | ~50MB          | ~1GB          | ~5GB                  | ~2GB            | ~7GB tooling    |
+
+**Alexandria es el único proyecto con control por voz 100% offline** — usa Whisper para transcripción y mlx-audio para síntesis, sin enviar audio a ninguna nube.
 
 Alexandria consume ~50MB de código. Es el proyecto más ligero orientado a autonomía real.
 
