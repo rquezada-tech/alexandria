@@ -1,0 +1,102 @@
+---
+title: "Rodamina"
+domain: manufactura
+subtopic: quimica
+source: wikipedia
+has_images: false
+---
+
+Rodamina
+    
+    
+- 
+    
+-  
+- 
+    
+- 
+    
+- 
+    
+- 
+    
+- 
+    
+    
+- 
+    
+- 
+    
+- 
+    
+- 
+    
+- 
+  
+  
+    
+      
+        
+          
+            
+              
+## Rodamina
+
+            
+            
+            
+              
+                
+
+              
+
+              
+Rodamina es el nombre de una familia de compuestos orgánicos heterocíclicos fluorescentes, basados en el xanteno. Pueden considerarse derivados de la fluoresceína.[1]​ Algunos componentes de esta familia son la rodamina 6G, la rodamina B y la rodamina 123. Se utilizan como colorantes y como medio amplificador en los láseres de colorante. También se utilizan a menudo como un tinte indicador en el agua para determinar el volumen, la velocidad y las direcciones de flujo y transporte.
+
+Su detección es fácil y poco costosa empleando instrumentos llamados fluorómetros. Los colorantes de la familia de la rodamina se utilizan en aplicaciones de biotecnología, tales como la microscopia de fluorescencia, citometría de flujo, la espectroscopia de correlación de fluorescencia, y los ensayos ELISA.
+
+Las rodaminas son solubles en agua, metanol y etanol. En general, presentan cierta toxicidad.
+
+## Otros derivados de la rodamina
+
+Existen muchos derivados de la rodamina utilizados con fines múltiples entre los que se incluyen, por ejemplo, la tetrametilrodamina (TAMRA) y su isotiocianato (TRITC), la sulforodamina 101 y su cloruro de sulfonilo (Texas Red), y el rojo de rodamina. 
+
+TRICT, una molécula construida sobre el esqueleto básico de la rodamina (3-desoxi-4,12-diamino-8-fenil-fluorona) modificada con un grupo funcional isotiocianato (-N=C=S), es reactivo frente a los grupos amino de las proteínas dentro de una célula in vivo. La NHS-rodamina, un éster derivado con un grupo succinimidilo, es también reactiva frente a las aminas.
+
+Otros derivados de la rodamina incluyen a los nuevos fluoróforos, como Alexa (flúor) (en) y DyLight Fluor (en) que se han sintetizado para aplicaciones químicas y biológicas que requieren más fotoestabilidad o más fluorescencia, diferentes características espectrales o distintos grupos químicos sustituyentes.
+
+## Referencias
+
+- ↑ P. E. Vitoria (1940). La Química del Carbono, 2da Edición, Barcelona, España. Capítulo III, "Fluoresceína, ftaleína de la resorcina", p. 684.
+
+- Espectro de absorción y  de emisión para la rodamina B
+
+- Espectro de absorción y  de emisión para la rodamina 6G
+
+- Espectro de absorción y  de emisión para la rodamina 123
+
+- Berlier et al.; J. Histochem. Cytochem., 2003. Alexa 633, un derivado de la rodamina.
+
+Control de autoridades
+
+- Proyectos Wikimedia
+
+-  Datos: Q420410
+
+-  Multimedia: Rhodamines / Q420410
+
+- Identificadores
+
+- AAT: 300311474
+
+- Identificadores médicos
+
+- MeSH: D012235
+
+- UMLS: C0035483
+
+-  Datos: Q420410
+
+-  Multimedia: Rhodamines / Q420410
+
+    Este artículo ha sido escrito por Wikipedia. El texto está disponible bajo la licencia Creative Commons Attribution-Share Alike 4.0. Pueden aplicarse cláusulas adicionales a los archivos multimedia.
