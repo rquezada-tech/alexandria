@@ -36,15 +36,15 @@ Está diseñada para:
 
 | Dominio | Contenido | Artículos |
 |---|---|---:|
-| Medicina | Primeros auxilios, salud básica, biología | 31,342 |
-| Historia | Civilizaciones, geografía, eventos | 32,057 |
-| Manufactura | Química, física, matemáticas | 34,308 |
-| Electrónica | Computación, componentes, DIY | 28,205 |
-| Supervivencia | Agua, alimentación, refugio, fuego | 4 |
+| Medicina | Primeros auxilios, salud básica | 3 |
+| Historia | Civilizaciones, geografía | 2 |
+| Manufactura | Química, física, matemáticas | 3,609 |
+| Electrónica | Computación, componentes, DIY | 4 |
+| Supervivencia | Agua, refugio, fuego, orientación, fauna | 11 |
 | Herramientas | Fabricación, reparación, nudos | 4 |
 | Comunicaciones | Radio FM, Morse, antenas | 1 |
 
-El contenido se alimenta desde Wikipedia vía dumps ZIM y artículos Markdown propios. Se expande agregando archivos `.md` a la carpeta `content/`.
+El contenido se expande agregando archivos `.md` a la carpeta `content/`.
 
 ## Requisitos
 
@@ -422,30 +422,26 @@ Alexandria consume ~50MB de código. Es el proyecto más ligero orientado a auto
 - [x] Voz offline (STT con Whisper + TTS con mlx-audio)
 - [x] Frontend con interfaz de voz (micrófono + altavoz)
 - [x] Imágenes inline en artículos (figcaption, galería, lightbox)
-- [x] Mapas offline (PMTiles + MapLibre GL, un solo archivo HTML)
-- [x] Indexación incremental (watch mode con watchdog, re-index automático de content/)
-
-- [x] Integración con Kolibri (importa canales .kolibri como artículos con frontmatter kolibri)
-- [x] Notas personales (editor Markdown offline con auto-guardado y tags)
-
-
+- [x] Mapas offline (PMTiles + MapLibre GL, viewer en /maps)
+- [x] Indexación incremental (watch mode con watchdog, re-index automático)
+- [x] Lector de ebooks Markdown offline (navegación por capítulos, /ebooks)
+- [x] Integración con Kolibri (import_kolibri_channel.py)
+- [x] Notas personales (editor Markdown offline con auto-guardado y tags, /notes)
+- [x] SVGs visuales en artículos de supervivencia (8 SVGs: nudos, navegación, fauna, refugio, señales)
 
 ### Próximos
 - [ ] Exportar / importar base (zip: .db + content/)
 - [ ] Métricas de calidad de artículos (completitud, enlaces internos)
 - [ ] UI mejorada: dark mode, búsqueda avanzada, render de markdown
-- [x] Lector de ebooks Markdown (usa el mismo content/ que artículos, navegación por capítulos)
 - [ ] CLI de gestión (`alexandria-cli` para ingestar, exportar, diagnosticar)
 - [ ] Script de upgrade: `curl | bash` para actualizar desde GitHub
 - [ ] Sync de contenido via filesystem (copiar carpeta content/ por USB)
 
-### No planeados (van contra la misión de ser ligero)
+### No planeados (van contra la filosofía de ser ligero)
 - Sistema de autenticación / multi-usuario
 - Base de datos vectorial (Qdrant, Chroma, etc.)
 - Más contenedores Docker además de Alexandria + Ollama
-- [x] Kolibri / Khan Academy (integrado — usa import_kolibri_channel.py)
 - CyberChef embebido
-- [x] FlatNotes / app de notas separada (integrado — editor en /notes)
 - Command Center con panel de control complejo
 
 ---
