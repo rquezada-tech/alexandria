@@ -10,7 +10,7 @@
 <div align="center">
 
 ![Estado](https://img.shields.io/badge/Estado-Desarrollo-ff6b00?style=flat-square&labelColor=374151)
-![Versión](https://img.shields.io/badge/Versión-0.7.5-2563eb?style=flat-square&labelColor=374151)
+![Versión](https://img.shields.io/badge/Versión-0.7.6-2563eb?style=flat-square&labelColor=374151)
 ![Paradigma](https://img.shields.io/badge/Paradigma-Offline%20First-f97316?style=flat-square&labelColor=374151)
 ![IA](https://img.shields.io/badge/IA-Ollama%20%2B%20Voz%20Offline-7c3aed?style=flat-square&labelColor=374151)
 ![Hardware](https://img.shields.io/badge/Hardware-Raspberry%20Pi%20%2F%20PC-ec4899?style=flat-square&labelColor=374151)
@@ -240,6 +240,26 @@ Channels importados generan:
 > Úsalos directamente desde Kolibri o cópialos manualmente a `_files/`.
 > Alexandria los referencia y los busca en texto para contexto de chat.
 
+## Notas personales
+
+Alexandria incluye un editor de notas personales integrado que funciona 100% offline:
+
+```bash
+# Accede desde http://localhost:8080/notes
+```
+
+Características del sistema de notas:
+
+- **CRUD completo** — crear, editar y eliminar notas
+- **Búsqueda full-text** — busca en título, contenido y tags
+- **Tags** — organiza con etiquetas, filtra por tag
+- **Auto-guardado** — guarda automáticamente 2s después de dejar de escribir
+- **Editor Markdown** — toolbar rápido con negrita, cursiva, código, listas, encabezados, enlaces
+- **Preview** — alterna entre editor raw y vista renderizada
+- **Tags con autocompletado** — sugiere tags existentes mientras escribes
+
+Las notas se guardan en `content/notes/` como archivos `.md` con frontmatter. Puedes editarlos directamente con cualquier editor de texto o moverlos por USB.
+
 ## Uso
 
 ### Agregar conocimiento nuevo
@@ -396,6 +416,7 @@ Alexandria consume ~50MB de código. Es el proyecto más ligero orientado a auto
 - [x] Indexación incremental (watch mode con watchdog, re-index automático de content/)
 - [x] Lector de ebooks Markdown (usa el mismo content/ que artículos, navegación por capítulos)
 - [x] Integración con Kolibri (importa canales .kolibri como artículos con frontmatter kolibri)
+- [x] Notas personales (editor Markdown offline con auto-guardado y tags)
 
 
 
@@ -414,7 +435,7 @@ Alexandria consume ~50MB de código. Es el proyecto más ligero orientado a auto
 - Más contenedores Docker además de Alexandria + Ollama
 # ~ Kolibri / Khan Academy (integrado via import_kolibri_channel.py)
 - CyberChef embebido
-- FlatNotes u otra app de notas separada
+# ~ FlatNotes / app de notas separada (integrado via /notes)
 - Command Center con panel de control complejo
 
 ---
