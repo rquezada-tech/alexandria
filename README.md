@@ -205,6 +205,14 @@ No se usa ChromaDB, Pinecone, ni ningún servicio externo. La base de conocimien
 
 MIT
 
+## Colaboración
+
+Este proyecto está abierto a contribuciones. Si quieres participar, puedes abrir issues, proponer mejoras, corregir documentación, agregar contenido Markdown o ayudar con el backend y la interfaz.
+
+Se agradecen especialmente los aportes que mantengan el enfoque del proyecto: conocimiento útil, verificable, offline y de bajo consumo de recursos.
+
+Antes de enviar un pull request, intenta seguir la estructura del repositorio y explicar claramente el cambio realizado.
+
 ---
 
 *Alexandria: la ambición de preservar todo el conocimiento de la humanidad en un solo lugar accesible offline.*
