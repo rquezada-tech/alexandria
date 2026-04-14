@@ -10,9 +10,9 @@
 <div align="center">
 
 ![Estado](https://img.shields.io/badge/Estado-Desarrollo-ff6b00?style=flat-square&labelColor=374151)
-![Versión](https://img.shields.io/badge/Versión-0.6.0-2563eb?style=flat-square&labelColor=374151)
+![Versión](https://img.shields.io/badge/Versión-0.6.1-2563eb?style=flat-square&labelColor=374151)
 ![Paradigma](https://img.shields.io/badge/Paradigma-Offline%20First-f97316?style=flat-square&labelColor=374151)
-![IA](https://img.shields.io/badge/IA-Local%20(Llamafile/Ollama)-7c3aed?style=flat-square&labelColor=374151)
+![IA](https://img.shields.io/badge/IA-Ollama%20%7C%20MiniMax-7c3aed?style=flat-square&labelColor=374151)
 ![Hardware](https://img.shields.io/badge/Hardware-Raspberry%20Pi%20%2F%20PC-ec4899?style=flat-square&labelColor=374151)
 ![RAM](https://img.shields.io/badge/RAM-4GB%20mín.-22c55e?style=flat-square&labelColor=374151)
 ![Stack](https://img.shields.io/badge/Stack-Python%20%2B%20SQLite%20%2B%20FastAPI-0ea5e9?style=flat-square&labelColor=374151)
@@ -148,6 +148,47 @@ Modelos compatibles con Ollama:
 | 8-16 GB | `qwen3:8b` |
 | 16+ GB | `qwen3:14b` o mayor |
 
+### Proveedores LLM
+
+Alexandria soporta dos proveedores de lenguaje:
+
+| Proveedor | Modo | Cuándo usarlo |
+|---|---|---|
+| **Ollama** *(por defecto)* | Offline | Sin Internet, privacidad total, hardware propio |
+| **MiniMax** | Cloud | Desarrollo, pruebas, calidad máxima sin GPU local |
+
+#### Usar MiniMax
+
+```bash
+# Exporta tu API key (obtenla en https://www.minimaxi.chat/)
+export MINIMAX_API_KEY=tu_api_key_aqui
+export LLM_PROVIDER=minimax
+
+# Opcional: cambiar modelo (por defecto: MiniMax-M2.7)
+export MINIMAX_MODEL=MiniMax-M2.7
+
+./run.sh
+```
+
+#### Variables de entorno disponibles
+
+| Variable | Defecto | Descripción |
+|---|---|---|
+| `LLM_PROVIDER` | `ollama` | Proveedor activo (`ollama` o `minimax`) |
+| `OLLAMA_BASE` | `http://localhost:11434` | URL base de Ollama |
+| `MINIMAX_API_KEY` | — | API key de MiniMax (requerida si `LLM_PROVIDER=minimax`) |
+| `MINIMAX_MODEL` | `MiniMax-M2.7` | Modelo MiniMax a usar |
+| `MINIMAX_BASE` | `https://api.minimaxi.chat/v1` | Base URL de la API MiniMax |
+| `ALEXANDRIA_PORT` | `8080` | Puerto del servidor |
+
+Copia `.env.example` como `.env` para configurar fácilmente:
+
+```bash
+cp .env.example .env
+# Edita .env con tus valores
+```
+
+
 ## Estructura del proyecto
 
 ```
@@ -202,6 +243,7 @@ No se usa ChromaDB, Pinecone, ni ningún servicio externo. La base de conocimien
 
 - [x] Pipeline de descarga masiva de Wikipedia (ZIM)
 - [x] 125,000+ artículos de Wikipedia ingestados
+- [x] Soporte para múltiples proveedores LLM (Ollama + MiniMax)
 - [ ] Dockerización (un solo comando)
 - [ ] Soporte para imágenes inline en artículos
 - [ ] Mapas offline (Organic Maps)
