@@ -77,7 +77,7 @@ ollama pull qwen3:14b            # o el modelo que prefieras
 ./run.sh
 ```
 
-Abre **http://localhost:8080/static/index.html** en tu navegador.
+Abre **http://localhost:8080** en tu navegador.
 
 
 ## Docker (un solo comando)
@@ -96,7 +96,7 @@ cd alexandria
 docker compose up
 ```
 
-Abre **http://localhost:8080/static/index.html**
+Abre **http://localhost:8080**
 
 ### Modelos disponibles
 
@@ -310,6 +310,12 @@ Alexandria expone una API REST en `http://localhost:8080`:
 | GET | `/ebooks` | Lector de ebooks offline |
 | GET | `/ebooks/list` | Lista libros y capítulos |
 | GET | `/ebooks/chapter?book=&idx=` | Contenido de un capítulo |
+| GET | `/notes` | Editor de notas personales |
+| GET | `/notes/list?q=&tag=` | Lista notas (búsqueda + filtro) |
+| GET | `/notes/tags` | Tags de notas con conteo |
+| POST | `/notes` | Crea nota nueva |
+| PUT | `/notes/{slug}` | Actualiza nota |
+| DELETE | `/notes/{slug}` | Elimina nota |
 | POST | `/chat` | Chat con contexto recuperado |
 | POST | `/audio/stt` | Transcribe audio a texto (Whisper) |
 | GET | `/audio/tts?q=` | Sintetiza texto a audio (mlx-audio) |
@@ -347,7 +353,8 @@ alexandria/
 │   ├── db.py          # Schema SQLite FTS5 + helpers
 │   ├── api.py         # FastAPI (endpoints REST + audio STT/TTS)
 │   ├── audio.py       # Módulo de audio: Whisper (STT) + mlx-audio (TTS)
-│   └── ingest.py      # Script de ingestión de contenido
+│   ├── ingest.py      # Script de ingestión de contenido
+│   └── watch.py      # Watch mode (indexación incremental con watchdog)
 ├── content/           # Carpeta de conocimiento (Markdown)
 │   ├── medicina/
 │   ├── supervivencia/
@@ -355,14 +362,23 @@ alexandria/
 │   ├── herramientas/
 │   ├── electronica/
 │   ├── manufactura/
-│   └── comunicaciones/
-├── data/              # SQLite DB (generado automáticamente)
+│   ├── comunicaciones/
+│   ├── ebooks/        # Ebooks (libros en Markdown por capítulos)
+│   ├── kolibri/       # Contenido importado de canales Kolibri
+│   └── notes/         # Notas personales (archivos .md)
+├── data/              # SQLite DB + mapas offline + audio
 ├── frontend/
-│   └── index.html    # Interfaz web
+│   ├── index.html    # Interfaz principal
+│   ├── maps.html     # Visualizador de mapas offline
+│   ├── ebooks.html   # Lector de ebooks
+│   └── notes.html    # Editor de notas personales
 ├── scripts/
-│   ├── zim_extract     # Extractor C++ de dumps ZIM
-│   ├── zim_pipeline.py # Pipeline completo ZIM → Alexandria
-│   └── html_to_alexandria.py  # Conversor HTML → Markdown
+│   ├── zim_extract       # Extractor C++ de dumps ZIM
+│   ├── zim_pipeline.py   # Pipeline completo ZIM → Alexandria
+│   ├── html_to_alexandria.py  # Conversor HTML → Markdown
+│   ├── import_kolibri_channel.py  # Importador de canales Kolibri
+│   ├── download_pmtiles.py   # Descargador de mapas PMTiles
+│   └── setup_maps_libs.py   # Setup de librerías MapLibre
 ├── requirements.txt
 └── run.sh
 ```
@@ -399,12 +415,6 @@ No se usa ChromaDB, Pinecone, ni ningún servicio externo. La base de conocimien
 
 Alexandria consume ~50MB de código. Es el proyecto más ligero orientado a autonomía real.
 
-## Roadmap
-
-- [x] Pipeline de descarga masiva de Wikipedia (ZIM)
-- [x] 125,000+ artículos de Wikipedia ingestados
-- [x] Dockerización (un solo comando)
-
 ### Completado
 - [x] Pipeline de descarga masiva de Wikipedia (ZIM)
 - [x] 125,000+ artículos de Wikipedia ingestados
@@ -414,7 +424,7 @@ Alexandria consume ~50MB de código. Es el proyecto más ligero orientado a auto
 - [x] Imágenes inline en artículos (figcaption, galería, lightbox)
 - [x] Mapas offline (PMTiles + MapLibre GL, un solo archivo HTML)
 - [x] Indexación incremental (watch mode con watchdog, re-index automático de content/)
-- [x] Lector de ebooks Markdown (usa el mismo content/ que artículos, navegación por capítulos)
+
 - [x] Integración con Kolibri (importa canales .kolibri como artículos con frontmatter kolibri)
 - [x] Notas personales (editor Markdown offline con auto-guardado y tags)
 
@@ -433,9 +443,9 @@ Alexandria consume ~50MB de código. Es el proyecto más ligero orientado a auto
 - Sistema de autenticación / multi-usuario
 - Base de datos vectorial (Qdrant, Chroma, etc.)
 - Más contenedores Docker además de Alexandria + Ollama
-# ~ Kolibri / Khan Academy (integrado via import_kolibri_channel.py)
+- [x] Kolibri / Khan Academy (integrado — usa import_kolibri_channel.py)
 - CyberChef embebido
-# ~ FlatNotes / app de notas separada (integrado via /notes)
+- [x] FlatNotes / app de notas separada (integrado — editor en /notes)
 - Command Center con panel de control complejo
 
 ---
