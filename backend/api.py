@@ -1,10 +1,8 @@
 """
 Alexandria - API FastAPI
 Endpoints para búsqueda, chat y administración
-Soporta múltiples proveedores LLM: Ollama (offline) y MiniMax (cloud)
 """
 import os
-import sys
 import uuid
 import json
 from pathlib import Path
@@ -35,18 +33,10 @@ from db import (
 DATA_DIR = sys_path / "data"
 CONTENT_DIR = sys_path / "content"
 PORT = int(os.getenv("ALEXANDRIA_PORT", "8080"))
-
-# Ollama (proveedor offline por defecto)
 OLLAMA_BASE = os.getenv("OLLAMA_BASE", "http://localhost:11434")
 
-# MiniMax (proveedor cloud alternativo)
-LLM_PROVIDER = os.getenv("LLM_PROVIDER", "ollama").lower()   # "ollama" | "minimax"
-MINIMAX_API_KEY = os.getenv("MINIMAX_API_KEY", "")
-MINIMAX_MODEL = os.getenv("MINIMAX_MODEL", "MiniMax-M2.7")
-MINIMAX_BASE = os.getenv("MINIMAX_BASE", "https://api.minimaxi.chat/v1")
-
 # ── App ─────────────────────────────────────────────────
-app = FastAPI(title="Alexandria API", version="0.2.0")
+app = FastAPI(title="Alexandria API", version="0.1.0")
 
 app.add_middleware(
     CORSMiddleware,
@@ -100,10 +90,8 @@ def retrieve_context(question: str, domain: Optional[str], limit: int) -> tuple[
     return "\n\n---\n\n".join(context_parts), results
 
 
-# ── LLM Providers ────────────────────────────────────────
-
 def call_ollama(model: str, messages: list[dict]) -> str:
-    """Llama a Ollama con Messages API (modo offline)."""
+    """Llama a Ollama con Messages API."""
     with httpx.Client(timeout=120) as client:
         response = client.post(
             f"{OLLAMA_BASE}/api/chat",
@@ -117,61 +105,9 @@ def call_ollama(model: str, messages: list[dict]) -> str:
     return data["message"]["content"]
 
 
-def call_minimax(model: str, messages: list[dict]) -> str:
-    """Llama a MiniMax via API compatible con OpenAI Chat Completions."""
-    if not MINIMAX_API_KEY:
-        raise HTTPException(
-            status_code=500,
-            detail="MINIMAX_API_KEY no configurada. Exporta la variable de entorno antes de iniciar Alexandria.",
-        )
-
-    headers = {
-        "Authorization": f"Bearer {MINIMAX_API_KEY}",
-        "Content-Type": "application/json",
-    }
-
-    payload = {
-        "model": model,
-        "messages": messages,
-        "stream": False,
-        "temperature": 0.7,
-        "max_tokens": 1024,
-    }
-
-    with httpx.Client(timeout=120) as client:
-        response = client.post(
-            f"{MINIMAX_BASE}/chat/completions",
-            headers=headers,
-            json=payload,
-        )
-
-    if response.status_code != 200:
-        raise HTTPException(status_code=502, detail=f"MiniMax error {response.status_code}: {response.text}")
-
-    data = response.json()
-    try:
-        return data["choices"][0]["message"]["content"]
-    except (KeyError, IndexError) as e:
-        raise HTTPException(status_code=502, detail=f"Respuesta inesperada de MiniMax: {data}")
-
-
-def call_llm(model: str, messages: list[dict], provider: Optional[str] = None) -> str:
-    """Enruta la llamada al proveedor de LLM configurado."""
-    active_provider = provider or LLM_PROVIDER
-    if active_provider == "minimax":
-        return call_minimax(model=model, messages=messages)
-    else:
-        return call_ollama(model=model, messages=messages)
-
-
-def select_model(provider: Optional[str] = None) -> str:
-    """Selecciona el modelo por defecto según el proveedor activo."""
-    active_provider = provider or LLM_PROVIDER
-
-    if active_provider == "minimax":
-        return MINIMAX_MODEL
-
-    # Ollama: heurística por RAM disponible
+def select_model() -> str:
+    """Selecciona el modelo más apropiado según RAM disponible (heurística simple)."""
+    # Intentar detectar memoria disponible
     try:
         import psutil
         mem = psutil.virtual_memory()
@@ -185,7 +121,7 @@ def select_model(provider: Optional[str] = None) -> str:
         else:
             return "qwen2.5:3b"
     except ImportError:
-        return "qwen2.5:3b"
+        return "qwen2.5:3b"  # fallback seguro
 
 
 # ── Endpoints ───────────────────────────────────────────
@@ -196,12 +132,7 @@ def startup():
 
 @app.get("/health")
 def health():
-    return {
-        "status": "ok",
-        "version": "0.2.0",
-        "llm_provider": LLM_PROVIDER,
-        "default_model": select_model(),
-    }
+    return {"status": "ok", "version": "0.1.0"}
 
 
 @app.get("/domains")
@@ -239,7 +170,7 @@ def search_endpoint(
     }
 
 
-@app.get("/content/{content_id}")
+@app.get("/content/<int:content_id>")
 def get_content(content_id: int):
     content = get_content_by_id(content_id)
     if not content:
@@ -274,7 +205,6 @@ def chat(req: ChatRequest):
             "answer": "No encontré información relevante para tu pregunta en la base de conocimiento. ¿Podrías reformular o usar otros términos?",
             "sources": [],
             "model": model,
-            "provider": LLM_PROVIDER,
         }
 
     # 2. Construir prompt con contexto
@@ -285,11 +215,9 @@ def chat(req: ChatRequest):
 
     user_msg = {"role": "user", "content": req.question}
 
-    # 3. Llamar al LLM (Ollama u otro proveedor)
+    # 3. Llamar Ollama
     try:
-        answer = call_llm(model=model, messages=[system_msg, user_msg])
-    except HTTPException:
-        raise
+        answer = call_ollama(model=model, messages=[system_msg, user_msg])
     except Exception as e:
         raise HTTPException(status_code=502, detail=f"Error al generar respuesta: {str(e)}")
 
@@ -311,11 +239,10 @@ def chat(req: ChatRequest):
             for r in results
         ],
         "model": model,
-        "provider": LLM_PROVIDER,
     }
 
 
-@app.get("/chat/history/{session_id}")
+@app.get("/chat/history/<session_id>")
 def chat_history(session_id: str, limit: int = Query(default=20, ge=1, le=100)):
     history = get_chat_history(session_id=session_id, limit=limit)
     return {
