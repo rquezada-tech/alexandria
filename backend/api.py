@@ -44,7 +44,7 @@ PORT = int(os.getenv("ALEXANDRIA_PORT", "8080"))
 OLLAMA_BASE = os.getenv("OLLAMA_BASE", "http://localhost:11434")
 
 # ── App ─────────────────────────────────────────────────
-app = FastAPI(title="Alexandria API", version="0.3.2")
+app = FastAPI(title="Alexandria API", version="0.3.3")
 
 app.add_middleware(
     CORSMiddleware,
@@ -185,7 +185,7 @@ def startup():
 def health():
     return {
         "status": "ok",
-        "version": "0.3.2",
+        "version": "0.3.3",
         "audio": {
             "stt_available": is_whisper_available(),
             "tts_available": is_mlx_audio_available(),
@@ -412,6 +412,107 @@ def audio_capabilities():
             "voices": list_tts_voices(),
         },
     }
+
+
+# ── Ebooks offline ────────────────────────────────────
+import re
+import frontmatter as fm
+
+EBOOKS_DIR = sys_path / "content" / "ebooks"
+
+
+def _scan_ebooks():
+    """Escanea content/ebooks/ y devuelve lista de libros con sus capítulos."""
+    if not EBOOKS_DIR.exists():
+        return []
+
+    books = []
+    for book_dir in sorted(EBOOKS_DIR.iterdir()):
+        if not book_dir.is_dir():
+            continue
+        md_files = sorted(book_dir.glob("*.md"))
+        if not md_files:
+            continue
+
+        # Extraer metadata del primer archivo
+        first = md_files[0]
+        try:
+            post = fm.loads(first.read_text(encoding="utf-8"))
+            title = post.get("title", book_dir.name)
+            author = post.get("author", "")
+        except Exception:
+            title = book_dir.name
+            author = ""
+
+        # Todos los .md del folder son capítulos
+        chapters = []
+        for f in md_files:
+            fname = f.stem
+            # Tratar el primer archivo como book metadata o primer capítulo
+            if f == first:
+                ch_title = title
+            else:
+                # Limpiar nombre: "capitulo-01", "01-introduccion", etc.
+                ch_title_raw = re.sub(r"^\d+[-_]", "", fname)
+                ch_title = ch_title_raw.replace("-", " ").replace("_", " ").title()
+                # Extraer title del frontmatter si existe
+                try:
+                    ch_post = fm.loads(f.read_text(encoding="utf-8"))
+                    if ch_post.get("title"):
+                        ch_title = ch_post["title"]
+                except Exception:
+                    pass
+
+            chapters.append({
+                "title": ch_title,
+                "file": f.name,
+                "idx": len(chapters),
+            })
+
+        books.append({
+            "id": book_dir.name,
+            "title": title,
+            "author": author,
+            "path": str(book_dir.relative_to(sys_path)),
+            "chapters": chapters,
+        })
+
+    return books
+
+
+@app.get("/ebooks")
+def serve_ebooks():
+    """Sirve el lector de ebooks."""
+    ebooks_html = sys_path / "frontend" / "ebooks.html"
+    if not ebooks_html.exists():
+        raise HTTPException(status_code=404, detail="Ebooks viewer no encontrado")
+    return FileResponse(str(ebooks_html))
+
+
+@app.get("/ebooks/list")
+def list_ebooks():
+    """Lista libros y capítulos disponibles en content/ebooks/."""
+    return {"ebooks": _scan_ebooks()}
+
+
+@app.get("/ebooks/chapter")
+def get_ebook_chapter(book: str, idx: int):
+    """Devuelve el contenido Markdown de un capítulo específico."""
+    books = _scan_ebooks()
+    target = next((b for b in books if b["id"] == book), None)
+    if not target:
+        raise HTTPException(status_code=404, detail="Libro no encontrado")
+
+    if idx < 0 or idx >= len(target["chapters"]):
+        raise HTTPException(status_code=404, detail="Capítulo no encontrado")
+
+    chapter = target["chapters"][idx]
+    chapter_file = EBOOKS_DIR / book / chapter["file"]
+    if not chapter_file.exists():
+        raise HTTPException(status_code=404, detail="Archivo de capítulo no encontrado")
+
+    content = chapter_file.read_text(encoding="utf-8")
+    return Response(content=content, media_type="text/plain; charset=utf-8")
 
 
 # ── Mapas offline ──────────────────────────────────────

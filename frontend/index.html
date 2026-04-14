@@ -56,6 +56,12 @@
       padding: 0.2rem 0.7rem; border-radius: 20px; transition: all 0.15s;
     }
     .maps-btn:hover { color: var(--gold); border-color: var(--gold-dim); }
+    .ebooks-btn {
+      font-size: 0.78rem; color: var(--text-muted); text-decoration: none;
+      background: var(--surface2); border: 1px solid var(--border);
+      padding: 0.2rem 0.7rem; border-radius: 20px; transition: all 0.15s;
+    }
+    .ebooks-btn:hover { color: var(--gold); border-color: var(--gold-dim); }
 
     /* ── Layout ── */
     .layout { display: grid; grid-template-columns: 280px 1fr; min-height: calc(100vh - 60px); }
@@ -329,6 +335,9 @@
     <a href="/maps" class="maps-btn" id="maps-btn" title="Mapas offline" style="display:none">
       🗺️ Mapas
     </a>
+    <a href="/ebooks" class="ebooks-btn" id="ebooks-btn" title="Ebooks" style="display:none">
+      📚 Ebooks
+    </a>
     <span class="model-badge" id="model-badge">—</span>
     <span class="db-stats" id="db-stats">— artículos</span>
   </div>
@@ -406,6 +415,19 @@
         mapsBtn.textContent = `🗺️ Mapas (${downloaded.length})`;
       }
     } catch { /* maps no disponibles */ }
+
+    // Check available ebooks
+    try {
+      const r = await fetch(`${API}/ebooks/list`);
+      const d = await r.json();
+      const books = d.ebooks || [];
+      const ebooksBtn = document.getElementById('ebooks-btn');
+      if (books.length > 0) {
+        ebooksBtn.style.display = '';
+        const totalChapters = books.reduce((s, b) => s + b.chapters.length, 0);
+        ebooksBtn.textContent = `📚 Ebooks (${totalChapters} capítulos)`;
+      }
+    } catch { /* ebooks no disponibles */ }
   }
 
   function updateAudioStatus(audio) {

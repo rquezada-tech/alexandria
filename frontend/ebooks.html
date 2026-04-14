@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Alexandria — Ebooks</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Lora:ital,wght@0,400;0,600;1,400&family=Merriweather:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0d1117;
+      --surface: #161b22;
+      --surface2: #1c2128;
+      --border: #30363d;
+      --gold: #c9a227;
+      --gold-light: #e8c547;
+      --gold-dim: #a07d1a;
+      --text: #e6edf3;
+      --text-muted: #8b949e;
+      --text-dim: #484f58;
+      --danger: #f85149;
+      --success: #3fb950;
+      --font-body: 'Merriweather', 'Lora', Georgia, serif;
+      --font-ui: 'Inter', system-ui, sans-serif;
+      --font-heading: 'Lora', serif;
+      --reading-width: 680px;
+      --font-size-base: 17px;
+    }
+
+    html { height: 100%; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-ui);
+      height: 100%;
+      overflow: hidden;
+    }
+
+    /* ── Layout ── */
+    .app {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    /* ── Header ── */
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0.55rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-shrink: 0;
+      z-index: 10;
+    }
+    .back-btn {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 0.3rem 0.8rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      text-decoration: none;
+      transition: all 0.15s;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      white-space: nowrap;
+    }
+    .back-btn:hover { color: var(--gold); border-color: var(--gold-dim); }
+    .header-title {
+      flex: 1;
+      text-align: center;
+      font-family: var(--font-heading);
+      font-size: 0.95rem;
+      color: var(--gold);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .header-controls { display: flex; gap: 0.5rem; align-items: center; flex-shrink: 0; }
+
+    .icon-btn {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      width: 32px; height: 32px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.15s;
+    }
+    .icon-btn:hover { color: var(--gold); border-color: var(--gold-dim); }
+
+    /* ── Main area ── */
+    .main {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    /* ── Sidebar: book list + TOC ── */
+    .sidebar {
+      width: 260px;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      overflow: hidden;
+      transition: width 0.25s ease;
+    }
+    .sidebar.collapsed {
+      width: 0;
+      border-right: none;
+    }
+
+    .sidebar-section {
+      padding: 0.8rem 1rem 0.4rem;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-dim);
+      font-weight: 600;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .book-list {
+      overflow-y: auto;
+      flex-shrink: 0;
+      max-height: 200px;
+    }
+    .book-item {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.6rem 1rem;
+      cursor: pointer;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+      transition: all 0.1s;
+    }
+    .book-item:hover { background: var(--surface2); color: var(--text); }
+    .book-item.active { background: var(--surface2); color: var(--gold); }
+    .book-item .book-icon { font-size: 1.1rem; flex-shrink: 0; }
+    .book-item .book-title { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .book-item .book-chapters { font-size: 0.7rem; color: var(--text-dim); }
+
+    /* TOC */
+    .toc-header {
+      padding: 0.8rem 1rem 0.4rem;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-dim);
+      font-weight: 600;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .toc-list {
+      overflow-y: auto;
+      flex: 1;
+    }
+    .toc-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      border-left: 3px solid transparent;
+      transition: all 0.1s;
+    }
+    .toc-item:hover { background: var(--surface2); color: var(--text); }
+    .toc-item.active {
+      background: rgba(201, 162, 39, 0.08);
+      border-left-color: var(--gold);
+      color: var(--gold-light);
+    }
+    .toc-item .toc-num {
+      font-size: 0.68rem;
+      color: var(--text-dim);
+      min-width: 1.5rem;
+      text-align: right;
+      flex-shrink: 0;
+    }
+    .toc-item .toc-title { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    /* ── Reader ── */
+    .reader-pane {
+      flex: 1;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Progress bar */
+    .progress-bar {
+      height: 3px;
+      background: var(--border);
+      flex-shrink: 0;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: var(--gold);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    /* Scrollable content */
+    .reader-scroll {
+      flex: 1;
+      overflow-y: auto;
+      scroll-behavior: smooth;
+    }
+
+    .reader-content {
+      max-width: var(--reading-width);
+      margin: 0 auto;
+      padding: 2.5rem 2rem 4rem;
+    }
+
+    /* Typography */
+    .reader-content h1 {
+      font-family: var(--font-heading);
+      font-size: 2rem;
+      color: var(--gold);
+      margin-bottom: 0.4rem;
+      line-height: 1.3;
+    }
+    .reader-content .book-subtitle {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 2rem;
+      font-style: italic;
+    }
+    .reader-content h2 {
+      font-family: var(--font-heading);
+      font-size: 1.35rem;
+      color: var(--gold-light);
+      margin: 2rem 0 0.7rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.3rem;
+    }
+    .reader-content h3 {
+      font-family: var(--font-heading);
+      font-size: 1.1rem;
+      color: var(--text);
+      margin: 1.5rem 0 0.5rem;
+    }
+    .reader-content p {
+      font-family: var(--font-body);
+      font-size: var(--font-size-base);
+      line-height: 1.85;
+      color: var(--text);
+      margin-bottom: 1.1rem;
+    }
+    .reader-content p:first-of-type::first-letter {
+      font-size: 3.2rem;
+      float: left;
+      line-height: 0.8;
+      margin: 0.1rem 0.2rem 0 0;
+      color: var(--gold);
+      font-family: var(--font-heading);
+    }
+    .reader-content blockquote {
+      border-left: 3px solid var(--gold-dim);
+      margin: 1.5rem 0;
+      padding: 0.5rem 0 0.5rem 1.2rem;
+      color: var(--text-muted);
+      font-style: italic;
+      font-family: var(--font-body);
+    }
+    .reader-content code {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      padding: 0.1rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.85em;
+      color: var(--gold-light);
+    }
+    .reader-content pre {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem;
+      overflow-x: auto;
+      margin: 1.2rem 0;
+    }
+    .reader-content pre code {
+      background: none;
+      border: none;
+      padding: 0;
+      font-size: 0.85rem;
+      color: var(--text);
+    }
+    .reader-content ul, .reader-content ol {
+      margin: 0.8rem 0 1rem 1.5rem;
+      font-family: var(--font-body);
+      font-size: var(--font-size-base);
+      line-height: 1.8;
+    }
+    .reader-content li { margin-bottom: 0.3rem; }
+    .reader-content hr {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 2rem 0;
+    }
+    .reader-content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.2rem 0;
+      font-size: 0.88rem;
+    }
+    .reader-content th {
+      background: var(--surface2);
+      color: var(--gold);
+      padding: 0.5rem 0.8rem;
+      text-align: left;
+      border: 1px solid var(--border);
+      font-family: var(--font-ui);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .reader-content td {
+      padding: 0.5rem 0.8rem;
+      border: 1px solid var(--border);
+      font-family: var(--font-body);
+    }
+    .reader-content tr:nth-child(even) { background: var(--surface); }
+    .reader-content img {
+      max-width: 100%;
+      border-radius: 6px;
+      margin: 1rem 0;
+    }
+    .reader-content figure {
+      margin: 1.5rem 0;
+    }
+    .reader-content figcaption {
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      font-style: italic;
+      margin-top: 0.4rem;
+    }
+
+    /* ── Navigation footer ── */
+    .reader-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.8rem 2rem;
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+      flex-shrink: 0;
+    }
+    .nav-btn {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 0.4rem 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.82rem;
+      font-family: var(--font-ui);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: all 0.15s;
+    }
+    .nav-btn:hover:not(:disabled) { color: var(--gold); border-color: var(--gold-dim); }
+    .nav-btn:disabled { opacity: 0.3; cursor: default; }
+    .nav-info {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-align: center;
+    }
+
+    /* ── Empty / welcome state ── */
+    .welcome {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1.2rem;
+      padding: 2rem;
+      text-align: center;
+    }
+    .welcome h2 { font-family: var(--font-heading); color: var(--gold); font-size: 1.4rem; }
+    .welcome p { color: var(--text-muted); font-size: 0.9rem; max-width: 400px; line-height: 1.6; }
+    .welcome code {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.82rem;
+      color: var(--gold-light);
+    }
+    .welcome-structure {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem 1.5rem;
+      text-align: left;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      width: 100%;
+      max-width: 460px;
+    }
+    .welcome-structure code { color: var(--gold-light); font-size: 0.78rem; }
+
+    /* ── Settings overlay ── */
+    .settings-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 100;
+      display: none;
+      align-items: flex-start;
+      justify-content: center;
+      padding-top: 5rem;
+    }
+    .settings-overlay.open { display: flex; }
+    .settings-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      width: 340px;
+      box-shadow: 0 16px 48px rgba(0,0,0,0.5);
+    }
+    .settings-panel h3 {
+      font-family: var(--font-heading);
+      color: var(--gold);
+      margin-bottom: 1.2rem;
+      font-size: 1rem;
+    }
+    .setting-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+    .setting-label { font-size: 0.85rem; color: var(--text-muted); }
+    .setting-desc { font-size: 0.72rem; color: var(--text-dim); margin-top: 0.2rem; }
+    .font-size-btns { display: flex; gap: 0.4rem; }
+    .font-btn {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      width: 32px; height: 32px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .font-btn:hover, .font-btn.active { color: var(--gold); border-color: var(--gold-dim); }
+
+    .theme-btns { display: flex; gap: 0.5rem; }
+    .theme-btn {
+      flex: 1;
+      padding: 0.4rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.75rem;
+      text-align: center;
+      border: 2px solid var(--border);
+      color: var(--text-muted);
+      transition: all 0.15s;
+    }
+    .theme-btn:hover, .theme-btn.active { border-color: var(--gold); color: var(--gold); }
+
+    /* ── Loading ── */
+    .loading-book {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 1rem;
+      color: var(--text-muted);
+    }
+    .spinner {
+      width: 36px; height: 36px;
+      border: 3px solid var(--border);
+      border-top-color: var(--gold);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--text-dim); }
+
+    /* Mobile */
+    @media (max-width: 700px) {
+      .sidebar { position: fixed; left: 0; top: 0; bottom: 0; z-index: 50; width: 280px; transform: translateX(-100%); }
+      .sidebar.open { transform: translateX(0); }
+      .reader-content { padding: 1.5rem 1.2rem 3rem; }
+      .reader-nav { padding: 0.7rem 1rem; }
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <!-- Header -->
+  <header>
+    <a href="/" class="back-btn">← Alexandria</a>
+    <div class="header-title" id="header-title">Ebooks</div>
+    <div class="header-controls">
+      <button class="icon-btn" id="btn-toc" title="Índice" onclick="toggleSidebar()">☰</button>
+      <button class="icon-btn" id="btn-settings" title="Ajustes" onclick="toggleSettings()">⚙</button>
+    </div>
+  </header>
+
+  <!-- Progress -->
+  <div class="progress-bar"><div class="progress-bar-fill" id="progress-fill"></div></div>
+
+  <!-- Main -->
+  <div class="main">
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-section">Biblioteca</div>
+      <div class="book-list" id="book-list">
+        <div class="welcome" id="welcome-msg" style="padding:1rem 0;border:none;">
+          <p style="font-size:0.8rem;">Cargando biblioteca...</p>
+        </div>
+      </div>
+      <div class="toc-header">
+        <span>Índice</span>
+        <span id="toc-book-name" style="font-size:0.65rem;text-transform:none;letter-spacing:0;color:var(--text-dim)"></span>
+      </div>
+      <div class="toc-list" id="toc-list"></div>
+    </aside>
+
+    <!-- Reader pane -->
+    <div class="reader-pane" id="reader-pane">
+      <div class="reader-scroll" id="reader-scroll" onscroll="onScroll()">
+        <div class="reader-content" id="reader-content">
+          <div class="welcome">
+            <h2>Alexandria — Ebooks</h2>
+            <p>Lee libros offline organizados por capítulos en formato Markdown.</p>
+            <div class="welcome-structure">
+              <strong style="color:var(--text-muted);font-size:0.78rem;">Estructura esperada en content/ebooks/:</strong><br/><br/>
+              <code>MI_LIBRO/</code><br/>
+              &nbsp;&nbsp;<code>book.md</code>&nbsp;&nbsp;# metadata del libro<br/>
+              &nbsp;&nbsp;<code>capitulo-01.md</code><br/>
+              &nbsp;&nbsp;<code>capitulo-02.md</code><br/>
+              &nbsp;&nbsp;<code>...</code><br/><br/>
+              <strong style="color:var(--text-muted);font-size:0.78rem;">book.md (frontmatter):</strong><br/>
+              <code>title:</code>&nbsp;Mi Libro<br/>
+              <code>author:</code>&nbsp;Nombre Autor<br/>
+              <code>language:</code>&nbsp;es
+            </div>
+            <p style="font-size:0.78rem;">Los ebooks se sirven desde la misma carpeta <code>content/</code> que los artículos.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Navigation footer -->
+      <div class="reader-nav">
+        <button class="nav-btn" id="nav-prev" onclick="prevChapter()" disabled>← Anterior</button>
+        <div class="nav-info" id="nav-info"></div>
+        <button class="nav-btn" id="nav-next" onclick="nextChapter()" disabled>Siguiente →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Settings overlay -->
+<div class="settings-overlay" id="settings-overlay" onclick="if(event.target===this)toggleSettings()">
+  <div class="settings-panel">
+    <h3> Ajustes de lectura</h3>
+
+    <div class="setting-row">
+      <div>
+        <div class="setting-label">Tamaño de fuente</div>
+        <div class="setting-desc">Controla el tamaño del texto del libro</div>
+      </div>
+      <div class="font-size-btns">
+        <button class="font-btn" onclick="setFontSize(-1)">A-</button>
+        <button class="font-btn" id="font-size-display" style="width:auto;padding:0 0.5rem;font-size:0.78rem;" disabled></button>
+        <button class="font-btn" onclick="setFontSize(1)">A+</button>
+      </div>
+    </div>
+
+    <div class="setting-row">
+      <div>
+        <div class="setting-label">Tema</div>
+        <div class="setting-desc">Fondo claro u oscuro</div>
+      </div>
+      <div class="theme-btns">
+        <button class="theme-btn" onclick="setTheme('dark')">Oscuro</button>
+        <button class="theme-btn" onclick="setTheme('light')">Claro</button>
+        <button class="theme-btn" onclick="setTheme('sepia')">Sepia</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ── Config ───────────────────────────────────────────
+  const API = window.location.origin;
+  const FONTSIZES = [14, 15, 16, 17, 18, 19, 20, 21, 22];
+  let currentFontIdx = 3; // default 17px
+
+  // ── State ────────────────────────────────────────────
+  let books = [];          // lista de libros
+  let currentBook = null;  // { id, title, author, path, chapters: [{title, file}] }
+  let currentChapterIdx = 0;
+  let chapters = [];       // capítulos del libro actual
+
+  // ── Load book list ──────────────────────────────────
+  async function loadBooks() {
+    try {
+      const r = await fetch(`${API}/ebooks/list`);
+      const d = await r.json();
+      books = d.ebooks || [];
+      renderBookList();
+    } catch {
+      books = [];
+      renderBookList();
+    }
+  }
+
+  function renderBookList() {
+    const el = document.getElementById('book-list');
+    if (books.length === 0) {
+      el.innerHTML = `
+        <div style="padding:1rem;font-size:0.8rem;color:var(--text-muted);text-align:center;">
+          No hay ebooks en content/ebooks/<br/>
+          <span style="font-size:0.72rem;color:var(--text-dim)">Crea la carpeta y agrega archivos .md</span>
+        </div>`;
+      return;
+    }
+    el.innerHTML = books.map(b => `
+      <div class="book-item${currentBook && currentBook.id === b.id ? ' active' : ''}"
+           onclick="openBook('${b.id}')">
+        <span class="book-icon">📖</span>
+        <div style="flex:1;overflow:hidden">
+          <div class="book-title">${b.title}</div>
+          <div class="book-chapters">${b.chapters.length} capítulo${b.chapters.length !== 1 ? 's' : ''}</div>
+        </div>
+      </div>`).join('');
+  }
+
+  // ── Open a book ──────────────────────────────────────
+  async function openBook(bookId) {
+    const book = books.find(b => b.id === bookId);
+    if (!book) return;
+
+    currentBook = book;
+    chapters = book.chapters;
+    currentChapterIdx = 0;
+
+    document.getElementById('header-title').textContent = book.title;
+    document.getElementById('toc-book-name').textContent = book.title;
+    renderBookList();
+    renderTOC();
+    loadChapter(0);
+    saveProgress();
+  }
+
+  // ── Load chapter ─────────────────────────────────────
+  async function loadChapter(idx) {
+    if (!currentBook || idx < 0 || idx >= chapters.length) return;
+    currentChapterIdx = idx;
+
+    const chapter = chapters[idx];
+    const scrollEl = document.getElementById('reader-scroll');
+    const contentEl = document.getElementById('reader-content');
+
+    contentEl.innerHTML = `<div class="loading-book"><div class="spinner"></div><span>Cargando capítulo...</span></div>`;
+    scrollEl.scrollTop = 0;
+
+    try {
+      // Fetch markdown via API (proxied para no exponer estructura real)
+      const r = await fetch(`${API}/ebooks/chapter?book=${encodeURIComponent(currentBook.id)}&idx=${idx}`);
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      const text = await r.text();
+      renderMarkdown(text, chapter.title, idx);
+    } catch (e) {
+      contentEl.innerHTML = `<div style="padding:2rem;text-align:center;color:var(--danger)">Error cargando capítulo: ${e.message}</div>`;
+    }
+
+    updateNavButtons();
+    renderTOC();
+    updateProgress();
+    saveProgress();
+  }
+
+  function renderMarkdown(md, chapterTitle, idx) {
+    const contentEl = document.getElementById('reader-content');
+
+    // Minimal markdown-to-HTML renderer
+    let html = md;
+
+    // Frontmatter strip
+    html = html.replace(/^---[\s\S]*?---\n/, '');
+
+    // Tables
+    html = html.replace(/\|(.+)\|\n\|[-| :]+\|\n((?:\|.+\|\n?)*)/g, (match, header, body) => {
+      const ths = header.split('|').filter(c => c.trim()).map(c => `<th>${c.trim()}</th>`).join('');
+      const rows = body.trim().split('\n').map(row =>
+        '<tr>' + row.split('|').filter(c => c.trim()).map(c => `<td>${c.trim()}</td>`).join('') + '</tr>'
+      ).join('');
+      return `<table><thead><tr>${ths}</tr></thead><tbody>${rows}</tbody></table>`;
+    });
+
+    // Code blocks
+    html = html.replace(/```[\w]*\n([\s\S]*?)```/g, '<pre><code>$1</code></pre>');
+    // Inline code
+    html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+
+    // Headers (h1 solo en primer capítulo = título del libro)
+    html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
+    html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+    html = html.replace(/^# (.+)$/gm, (m, t) => {
+      // En capítulo 0 mostrar h1, en los demás convertir a h2
+      return idx === 0 ? `<h1>${t}</h1>` : `<h2>${t}</h2>`;
+    });
+
+    // Bold / italic
+    html = html.replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>');
+    html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
+    html = html.replace(/_(.+?)_/g, '<em>$1</em>');
+
+    // Images
+    html = html.replace(/!\[([^\]]*)\]\(([^\)]+)\)/g, '<figure><img src="$2" alt="$1" loading="lazy"/><figcaption>$1</figcaption></figure>');
+
+    // Links
+    html = html.replace(/\[([^\]]+)\]\(([^\)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+
+    // Horizontal rule
+    html = html.replace(/^---+$/gm, '<hr>');
+
+    // Blockquote
+    html = html.replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>');
+
+    // Lists
+    html = html.replace(/^- (.+)$/gm, '<li>$1</li>');
+    html = html.replace(/(<li>.*<\/li>\n?)+/g, '<ul>$&</ul>');
+    html = html.replace(/^\d+\. (.+)$/gm, '<li>$1</li>');
+
+    // Paragraphs (doble newline)
+    html = html.replace(/\n\n+/g, '</p><p>').replace(/^(?!<[hupblot])/gm, '');
+    if (!html.startsWith('<')) html = '<p>' + html + '</p>';
+    html = html.replace(/<p><\/p>/g, '');
+    html = html.replace(/<p>(<h[123]>)/g, '$1');
+    html = html.replace(/(<\/h[123]>)<\/p>/g, '$1');
+    html = html.replace(/<p>(<pre>)/g, '$1');
+    html = html.replace(/(<\/pre>)<\/p>/g, '$1');
+    html = html.replace(/<p>(<table>)/g, '$1');
+    html = html.replace(/(<\/table>)<\/p>/g, '$1');
+    html = html.replace(/<p>(<blockquote>)/g, '$1');
+    html = html.replace(/(<\/blockquote>)<\/p>/g, '$1');
+
+    // Build final HTML
+    contentEl.innerHTML = `<div class="book-chapter-title" style="display:none"></div>${html}`;
+    applyTheme();
+    applyFontSize();
+  }
+
+  // ── TOC ─────────────────────────────────────────────
+  function renderTOC() {
+    const el = document.getElementById('toc-list');
+    if (!currentBook || chapters.length === 0) {
+      el.innerHTML = '<div style="padding:1rem;font-size:0.78rem;color:var(--text-dim)">Selecciona un libro</div>';
+      return;
+    }
+    el.innerHTML = chapters.map((ch, i) => `
+      <div class="toc-item${i === currentChapterIdx ? ' active' : ''}" onclick="loadChapter(${i})">
+        <span class="toc-num">${i + 1}</span>
+        <span class="toc-title">${ch.title || 'Capítulo ' + (i + 1)}</span>
+      </div>`).join('');
+  }
+
+  // ── Navigation ──────────────────────────────────────
+  function prevChapter() { loadChapter(currentChapterIdx - 1); }
+  function nextChapter() { loadChapter(currentChapterIdx + 1); }
+
+  function updateNavButtons() {
+    document.getElementById('nav-prev').disabled = currentChapterIdx === 0;
+    document.getElementById('nav-next').disabled = currentChapterIdx >= chapters.length - 1;
+    document.getElementById('nav-info').textContent =
+      chapters.length > 0 ? `Capítulo ${currentChapterIdx + 1} de ${chapters.length}` : '';
+  }
+
+  // ── Progress ─────────────────────────────────────────
+  function updateProgress() {
+    if (chapters.length === 0) return;
+    const pct = Math.round(((currentChapterIdx + 1) / chapters.length) * 100);
+    document.getElementById('progress-fill').style.width = pct + '%';
+  }
+
+  function onScroll() {
+    const el = document.getElementById('reader-scroll');
+    const pct = Math.round((el.scrollTop / (el.scrollHeight - el.clientHeight)) * 100);
+    document.getElementById('progress-fill').style.width = pct + '%';
+  }
+
+  // ── Settings ─────────────────────────────────────────
+  function toggleSettings() {
+    document.getElementById('settings-overlay').classList.toggle('open');
+  }
+  function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('collapsed');
+  }
+
+  function setFontSize(dir) {
+    currentFontIdx = Math.max(0, Math.min(FONTSIZES.length - 1, currentFontIdx + dir));
+    applyFontSize();
+  }
