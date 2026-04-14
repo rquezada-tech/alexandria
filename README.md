@@ -1,24 +1,30 @@
-![Offline First](https://img.shields.io/badge/Offline%20First-Sí-ff6b00?style=for-the-badge)
-![Privacidad](https://img.shields.io/badge/Privacidad-Total-2f855a?style=for-the-badge)
-![IA Local](https://img.shields.io/badge/IA%20Local-Sí-7c3aed?style=for-the-badge)
-![Base de Conocimiento](https://img.shields.io/badge/Base%20de%20Conocimiento-SQLite%20%2B%20FTS5-2563eb?style=for-the-badge)
-![LLM](https://img.shields.io/badge/LLM-Ollama-0ea5e9?style=for-the-badge)
-![Stack](https://img.shields.io/badge/Backend-FastAPI%20%2B%20Python-22c55e?style=for-the-badge)
-![Hardware](https://img.shields.io/badge/Hardware-Raspberry%20Pi%20%2F%20PC-f97316?style=for-the-badge)
+# Alexandria
 
 <p align="center">
   <img src="https://github.com/rquezada-tech/alexandria/raw/main/logo_alexandria.png" alt="Alexandria Logo" width="340">
 </p>
 
-# Alexandria
-
 > *La memoria de la humanidad, preservada offline.*
 
-Alexandria es una base de conocimiento offline con inteligencia artificial local. Inspirada en la legendaria Biblioteca de Alejandría, permite consultar textos sobre supervivencia, medicina básica, historia, herramientas, electrónica y más — sin necesidad de conexión a Internet.
+<!-- Badges -->
+<div align="center">
+
+![Estado](https://img.shields.io/badge/Estado-Desarrollo-ff6b00?style=flat-square&labelColor=374151)
+![Versión](https://img.shields.io/badge/Versión-0.6.0-2563eb?style=flat-square&labelColor=374151)
+![Paradigma](https://img.shields.io/badge/Paradigma-Offline%20First-f97316?style=flat-square&labelColor=374151)
+![IA](https://img.shields.io/badge/IA-Local%20(Llamafile/Ollama)-7c3aed?style=flat-square&labelColor=374151)
+![Hardware](https://img.shields.io/badge/Hardware-Raspberry%20Pi%20%2F%20PC-ec4899?style=flat-square&labelColor=374151)
+![RAM](https://img.shields.io/badge/RAM-4GB%20mín.-22c55e?style=flat-square&labelColor=374151)
+![Stack](https://img.shields.io/badge/Stack-Python%20%2B%20SQLite%20%2B%20FastAPI-0ea5e9?style=flat-square&labelColor=374151)
+![Licencia](https://img.shields.io/badge/Licencia-MIT-2f855a?style=flat-square&labelColor=374151)
+
+</div>
 
 ## Qué es
 
-Alexandria responde preguntas usando una base de conocimiento local y un modelo de lenguaje que corre en tu hardware. No envía datos a ninguna nube. Todo funciona offline.
+Alexandria es una base de conocimiento offline con inteligencia artificial local. Inspirada en la legendaria Biblioteca de Alejandría, permite consultar textos sobre supervivencia, medicina básica, historia, herramientas, electrónica y más — sin necesidad de conexión a Internet.
+
+**Alexandria responde preguntas usando una base de conocimiento local y un modelo de lenguaje que corre en tu hardware. No envía datos a ninguna nube. Todo funciona offline.**
 
 Está diseñada para:
 - **Situaciones de emergencia** donde no hay Internet
@@ -28,19 +34,17 @@ Está diseñada para:
 
 ## Dominios de conocimiento
 
-Alexandria cubre estos dominios:
+| Dominio | Contenido | Artículos |
+|---|---|---:|
+| Medicina | Primeros auxilios, salud básica, biología | 31,342 |
+| Historia | Civilizaciones, geografía, eventos | 32,057 |
+| Manufactura | Química, física, matemáticas | 34,308 |
+| Electrónica | Computación, componentes, DIY | 28,205 |
+| Supervivencia | Agua, alimentación, refugio, fuego | 4 |
+| Herramientas | Fabricación, reparación, nudos | 4 |
+| Comunicaciones | Radio FM, Morse, antenas | 1 |
 
-| Dominio | Contenido |
-|---|---|
-| Medicina | Primeros auxilios, salud básica |
-| Supervivencia | Agua, alimentación, refugio |
-| Historia | Civilizaciones, eventos, personajes |
-| Herramientas | Fabricación, uso, reparación, nudos |
-| Electrónica | Componentes, fuentes, paneles solares DIY |
-| Manufactura | Química básica, solar, materiales |
-| Comunicaciones | Radio FM, Morse, antenas |
-
-El contenido se expande agregando archivos Markdown a la carpeta `content/`.
+El contenido se alimenta desde Wikipedia vía dumps ZIM y artículos Markdown propios. Se expande agregando archivos `.md` a la carpeta `content/`.
 
 ## Requisitos
 
@@ -100,10 +104,9 @@ python backend/ingest.py --verbose
 
 El contenido se indexa automáticamente en la base SQLite con búsqueda full-text.
 
-### Ingestar contenido de ejemplo
+### Ingestar todo el contenido
 
 ```bash
-# Primer uso: ingesta todo el contenido seed
 python backend/ingest.py --clear --verbose
 ```
 
@@ -164,8 +167,12 @@ alexandria/
 ├── data/              # SQLite DB (generado automáticamente)
 ├── frontend/
 │   └── index.html    # Interfaz web
-├── requirements.txt   # Dependencias Python
-└── run.sh            # Script de inicio
+├── scripts/
+│   ├── zim_extract     # Extractor C++ de dumps ZIM
+│   ├── zim_pipeline.py # Pipeline completo ZIM → Alexandria
+│   └── html_to_alexandria.py  # Conversor HTML → Markdown
+├── requirements.txt
+└── run.sh
 ```
 
 ## Arquitectura
@@ -178,7 +185,7 @@ Alexandria usa:
 - **RAG simple** — los chunks más relevantes se pasan como contexto al LLM
 - **Ollama** — cualquier modelo local (qwen, phi, llama, etc.)
 
-No se usa ChromaDB, Pinecone, ni ningún servicio externo. La base de conocimiento es un solo archivo SQLite.
+No se usa ChromaDB, Pinecone, ni ningún servicio externo. La base de conocimiento es un solo archivo SQLite (~2.3GB con Wikipedia completo).
 
 ## Diferencia con otros proyectos
 
@@ -193,25 +200,74 @@ No se usa ChromaDB, Pinecone, ni ningún servicio externo. La base de conocimien
 
 ## Roadmap
 
-- [ ] Pipeline de descarga masiva de Wikipedia y WikiMed
+- [x] Pipeline de descarga masiva de Wikipedia (ZIM)
+- [x] 125,000+ artículos de Wikipedia ingestados
 - [ ] Dockerización (un solo comando)
 - [ ] Soporte para imágenes inline en artículos
 - [ ] Mapas offline (Organic Maps)
-- [ ] Interface de chat conversacional
 - [ ] Indexación incremental (watch mode)
 - [ ] Exportar/importar base de conocimiento
+- [ ] Métricas de calidad del contenido
+
+---
+
+## Política de contribución
+
+> **Este proyecto eventualmente será público.** Mientras tanto, la colaboración está abierta bajo las mismas reglas.
+
+Alexandria welcomes contributions from the community. This project follows a **open contribution model** with the following principles:
+
+### ¿Cómo contribuir?
+
+**1. Contenido (artículos Markdown)**
+- Agrega artículos en español sobre los dominios existentes
+- Cada artículo debe tener frontmatter válido: `title`, `domain`, `subtopic`
+- El contenido debe ser verificable, práctico y orientado a autonomía
+- No aceptamos contenido que requiera conexión a Internet para funcionar
+
+**2. Código (backend, frontend, scripts)**
+- Abre un issue primero para discutir cambios mayores
+- Los PRs pequeños son mejores: resuelven un problema específico
+- Incluye tests si agregas funcionalidad nueva
+- Respeta la filosofía del proyecto: offline, simple, sin dependencias externas innecesarias
+
+**3. Reporte de errores**
+- Usa issues para reportar bugs con pasos para reproducir
+- Incluir el nombre del artículo, la pregunta feita y la respuesta esperada
+- Para bugs de búsqueda: incluye la query y los resultados obtenidos
+
+**4. Mejoras y features**
+- Discutimos en issues antes de implementar
+- Se valora especialmente todo lo que reduzca dependencias o simplifique el stack
+
+### Lo que NO vamos a aceptar
+
+- Contenido que infrinja derechos de autor (copias literales de fuentes con copyright)
+- Features que requieran servicios externos o conexión a Internet
+- Código que agregue dependencias de runtime innecesarias
+- Cambios que rompan la compatibilidad hacia atrás de la API
+
+### Proceso de PR
+
+```
+1. Fork del repositorio
+2. Crea una rama: git checkout -b feature/mi-mejora
+3. Haz tus cambios y commitea: git commit -m "Descripción clara"
+4. Push a tu fork: git push origin feature/mi-mejora
+5. Abre un Pull Request con descripción clara de qué y por qué
+```
+
+### Normas de conducta
+
+- Sé respetuoso con otros colaboradores
+- Las discusiones técnicas se resuelven con datos, no con opinión
+- Prioriza la utilidad práctica sobre la elegancia teórica
+
+---
 
 ## Licencia
 
 MIT
-
-## Colaboración
-
-Este proyecto está abierto a contribuciones. Si quieres participar, puedes abrir issues, proponer mejoras, corregir documentación, agregar contenido Markdown o ayudar con el backend y la interfaz.
-
-Se agradecen especialmente los aportes que mantengan el enfoque del proyecto: conocimiento útil, verificable, offline y de bajo consumo de recursos.
-
-Antes de enviar un pull request, intenta seguir la estructura del repositorio y explicar claramente el cambio realizado.
 
 ---
 
