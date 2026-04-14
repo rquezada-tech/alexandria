@@ -44,7 +44,7 @@ PORT = int(os.getenv("ALEXANDRIA_PORT", "8080"))
 OLLAMA_BASE = os.getenv("OLLAMA_BASE", "http://localhost:11434")
 
 # ── App ─────────────────────────────────────────────────
-app = FastAPI(title="Alexandria API", version="0.3.3")
+app = FastAPI(title="Alexandria API", version="0.3.4")
 
 app.add_middleware(
     CORSMiddleware,
@@ -185,7 +185,7 @@ def startup():
 def health():
     return {
         "status": "ok",
-        "version": "0.3.3",
+        "version": "0.3.4",
         "audio": {
             "stt_available": is_whisper_available(),
             "tts_available": is_mlx_audio_available(),
@@ -513,6 +513,278 @@ def get_ebook_chapter(book: str, idx: int):
 
     content = chapter_file.read_text(encoding="utf-8")
     return Response(content=content, media_type="text/plain; charset=utf-8")
+
+
+# ── Notas personales ────────────────────────────────────
+from datetime import datetime
+
+NOTES_DIR = sys_path / "content" / "notes"
+NOTES_DIR.mkdir(parents=True, exist_ok=True)
+
+# Dominio reservado para notas
+DOMAIN_NOTES = "notes"
+
+
+def _slugify(title: str) -> str:
+    """Genera un slug URL-safe desde el título."""
+    slug = title.lower().strip()
+    slug = re.sub(r"[^\w\s-]", "", slug)
+    slug = re.sub(r"[_\s]+", "-", slug)
+    slug = slug.strip("-")
+    if len(slug) > 60:
+        slug = slug[:60].rstrip("-")
+    return slug or "nota"
+
+
+def _note_path(slug: str) -> Path:
+    """Ruta del archivo .md para un slug dado."""
+    return NOTES_DIR / f"{slug}.md"
+
+
+def _read_note_meta(fp: Path) -> dict:
+    """Lee frontmatter y nombre de archivo como título fallback."""
+    try:
+        post = fm.loads(fp.read_text(encoding="utf-8"))
+        title = post.get("title", fp.stem.replace("-", " ").replace("_", " ").title())
+        tags = post.get("tags", [])
+        created = post.get("created", "")
+        updated = post.get("updated", "")
+        note_id = post.get("note_id", fp.stem)
+    except Exception:
+        title = fp.stem.replace("-", " ").replace("_", " ").title()
+        tags, created, updated, note_id = [], "", "", fp.stem
+    return {
+        "id": note_id,
+        "title": title,
+        "tags": tags if isinstance(tags, list) else [],
+        "created": created,
+        "updated": updated,
+        "slug": fp.stem,
+    }
+
+
+@app.get("/notes")
+def serve_notes():
+    """Sirve el viewer de notas personales."""
+    notes_html = sys_path / "frontend" / "notes.html"
+    if not notes_html.exists():
+        raise HTTPException(status_code=404, detail="Notes viewer no encontrado")
+    return FileResponse(str(notes_html))
+
+
+@app.get("/notes/list")
+def list_notes(q: str = Query(default=""), tag: str = Query(default=""), limit: int = Query(default=50, ge=1, le=200)):
+    """
+    Lista notas personales con búsqueda y filtro por tag.
+    Busca en título y tags. Retorna metadata, no contenido completo.
+    """
+    if not NOTES_DIR.exists():
+        return {"notes": [], "total": 0}
+
+    all_notes = []
+    for fp in sorted(NOTES_DIR.glob("*.md"), key=lambda f: f.stat().st_mtime, reverse=True):
+        meta = _read_note_meta(fp)
+
+        # Filtro por tag
+        if tag and tag not in meta["tags"]:
+            continue
+
+        # Búsqueda textual en título y tags
+        if q:
+            ql = q.lower()
+            haystack = " ".join([meta["title"].lower()] + [t.lower() for t in meta["tags"]])
+            # También buscar en contenido
+            try:
+                raw = fp.read_text(encoding="utf-8")
+                # Quitar frontmatter para buscar en body
+                raw = re.sub(r"^---[\s\S]*?---\n", "", raw)
+                haystack += " " + raw[:2000].lower()
+            except Exception:
+                pass
+            if ql not in haystack:
+                continue
+
+        # Extraer preview del body (primeras líneas sin headers)
+        try:
+            raw = fp.read_text(encoding="utf-8")
+            raw = re.sub(r"^---[\s\S]*?---\n", "", raw)
+            lines = [l for l in raw.split("\n") if l.strip() and not l.startswith("#")]
+            preview = " ".join(lines)[:200].strip()
+        except Exception:
+            preview = ""
+
+        all_notes.append({
+            **meta,
+            "preview": preview,
+            "word_count": len(preview.split()),
+        })
+
+        if len(all_notes) >= limit:
+            break
+
+    return {"notes": all_notes, "total": len(all_notes)}
+
+
+@app.post("/notes")
+def create_note(req: dict = None):
+    """
+    Crea una nota nueva.
+    Body: { "title": "...", "content": "...", "tags": [] }
+    Retorna: { "id", "slug", "path" }
+    """
+    data = req or {}
+    title = data.get("title", "Nueva nota").strip() or "Nueva nota"
+    content = data.get("content", "")
+    tags = data.get("tags", [])
+    if not isinstance(tags, list):
+        tags = []
+
+    note_id = str(uuid.uuid4())[:8]
+    slug = _slugify(title)
+    fp = _note_path(slug)
+
+    # Evitar colisiones de nombre
+    counter = 1
+    original_slug = slug
+    while fp.exists():
+        slug = f"{original_slug}-{counter}"
+        fp = _note_path(slug)
+        counter += 1
+
+    now = datetime.now().strftime("%Y-%m-%d")
+
+    # Construir frontmatter
+    frontmatter_lines = ["---"]
+    frontmatter_lines.append(f"title: {title}")
+    frontmatter_lines.append(f"note_id: {note_id}")
+    frontmatter_lines.append(f"domain: {DOMAIN_NOTES}")
+    frontmatter_lines.append(f"tags: [{', '.join(tags)}]" if tags else "tags: []")
+    frontmatter_lines.append(f"created: {now}")
+    frontmatter_lines.append(f"updated: {now}")
+    frontmatter_lines.append("---")
+    frontmatter_lines.append("")
+
+    full_content = "\n".join(frontmatter_lines) + content
+    fp.write_text(full_content, encoding="utf-8")
+
+    return {
+        "id": note_id,
+        "slug": slug,
+        "path": str(fp.relative_to(sys_path)),
+        "title": title,
+        "created": now,
+    }
+
+
+@app.get("/notes/{slug}")
+def get_note(slug: str):
+    """Devuelve el contenido completo de una nota (Markdown raw)."""
+    fp = _note_path(slug)
+    if not fp.exists():
+        raise HTTPException(status_code=404, detail="Nota no encontrada")
+
+    raw = fp.read_text(encoding="utf-8")
+    meta = _read_note_meta(fp)
+
+    return {
+        **meta,
+        "content": raw,
+        "path": str(fp.relative_to(sys_path)),
+    }
+
+
+@app.put("/notes/{slug}")
+def update_note(slug: str, req: dict):
+    """
+    Actualiza una nota existente.
+    Body: { "title"?: "...", "content"?: "...", "tags"?: [...] }
+    """
+    fp = _note_path(slug)
+    if not fp.exists():
+        raise HTTPException(status_code=404, detail="Nota no encontrada")
+
+    # Leer estado actual
+    try:
+        post = fm.loads(fp.read_text(encoding="utf-8"))
+    except Exception:
+        post = fm.Post("")
+
+    # Aplicar cambios
+    title = req.get("title", post.get("title", slug.replace("-", " ").title()))
+    content = req.get("content", str(post.content))
+    tags = req.get("tags", post.get("tags", []))
+    if not isinstance(tags, list):
+        tags = []
+
+    now = datetime.now().strftime("%Y-%m-%d")
+    created = post.get("created", now)
+    note_id = post.get("note_id", slug)
+
+    # Si cambió el título, renombrar archivo
+    new_slug = _slugify(title)
+    new_fp = _note_path(new_slug)
+
+    # Reconstruir archivo
+    frontmatter_lines = ["---"]
+    frontmatter_lines.append(f"title: {title}")
+    frontmatter_lines.append(f"note_id: {note_id}")
+    frontmatter_lines.append(f"domain: {DOMAIN_NOTES}")
+    frontmatter_lines.append(f"tags: [{', '.join(tags)}]" if tags else "tags: []")
+    frontmatter_lines.append(f"created: {created}")
+    frontmatter_lines.append(f"updated: {now}")
+    frontmatter_lines.append("---")
+    frontmatter_lines.append("")
+
+    full_content = "\n".join(frontmatter_lines) + content
+
+    # Si cambió slug, renombrar archivo
+    if new_slug != slug:
+        counter = 1
+        while new_fp.exists() and new_fp.stat().st_ino != fp.stat().st_ino:
+            new_fp = _note_path(f"{new_slug}-{counter}")
+            counter += 1
+        fp.rename(new_fp)
+
+    new_fp.write_text(full_content, encoding="utf-8")
+
+    return {
+        "id": note_id,
+        "slug": new_fp.stem,
+        "title": title,
+        "tags": tags,
+        "updated": now,
+        "created": created,
+    }
+
+
+@app.delete("/notes/{slug}")
+def delete_note(slug: str):
+    """Elimina una nota."""
+    fp = _note_path(slug)
+    if not fp.exists():
+        raise HTTPException(status_code=404, detail="Nota no encontrada")
+    fp.unlink()
+    return {"deleted": slug}
+
+
+@app.get("/notes/tags")
+def list_all_tags():
+    """Lista todas las tags usadas en notas, con conteo."""
+    if not NOTES_DIR.exists():
+        return {"tags": []}
+    tag_counts: dict[str, int] = {}
+    for fp in NOTES_DIR.glob("*.md"):
+        try:
+            post = fm.loads(fp.read_text(encoding="utf-8"))
+            tags = post.get("tags", [])
+            if not isinstance(tags, list):
+                tags = []
+            for t in tags:
+                tag_counts[t] = tag_counts.get(t, 0) + 1
+        except Exception:
+            pass
+    sorted_tags = sorted(tag_counts.items(), key=lambda x: -x[1])
+    return {"tags": [{"name": t, "count": c} for t, c in sorted_tags]}
 
 
 # ── Mapas offline ──────────────────────────────────────
