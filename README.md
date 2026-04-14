@@ -10,7 +10,7 @@
 <div align="center">
 
 ![Estado](https://img.shields.io/badge/Estado-Desarrollo-ff6b00?style=flat-square&labelColor=374151)
-![Versión](https://img.shields.io/badge/Versión-0.7.3-2563eb?style=flat-square&labelColor=374151)
+![Versión](https://img.shields.io/badge/Versión-0.7.4-2563eb?style=flat-square&labelColor=374151)
 ![Paradigma](https://img.shields.io/badge/Paradigma-Offline%20First-f97316?style=flat-square&labelColor=374151)
 ![IA](https://img.shields.io/badge/IA-Ollama%20%2B%20Voz%20Offline-7c3aed?style=flat-square&labelColor=374151)
 ![Hardware](https://img.shields.io/badge/Hardware-Raspberry%20Pi%20%2F%20PC-ec4899?style=flat-square&labelColor=374151)
@@ -193,6 +193,24 @@ Regiones disponibles para descarga:
 
 Los mapas se sirven desde `data/maps/` y se accede via `/maps`. No requieren conexión a Internet una vez descargados.
 
+## Ebooks offline
+
+Alexandria incluye un lector de libros en formato Markdown que funciona sin conexión:
+
+```bash
+# Los ebooks se organizan en content/ebooks/
+# Estructura:
+content/ebooks/MI_LIBRO/
+  book.md          # metadata (title, author, language)
+  capitulo-01.md   # capítulos en .md
+  capitulo-02.md
+  ...
+
+# Accede desde http://localhost:8080/ebooks
+```
+
+El lector incluye navegación por capítulos, tabla de contenidos, tipografía serif optimizada para lectura (Merriweather), drop cap, barra de progreso, temas (oscuro/claro/sepia) y ajustes de fuente. Funciona 100% offline.
+
 ## Uso
 
 ### Agregar conocimiento nuevo
@@ -240,6 +258,9 @@ Alexandria expone una API REST en `http://localhost:8080`:
 | GET | `/content/<id>/images` | Imágenes asociadas al artículo |
 | GET | `/maps` | Visualizador de mapas offline |
 | GET | `/maps/available` | Lista mapas offline descargados |
+| GET | `/ebooks` | Lector de ebooks offline |
+| GET | `/ebooks/list` | Lista libros y capítulos |
+| GET | `/ebooks/chapter?book=&idx=` | Contenido de un capítulo |
 | POST | `/chat` | Chat con contexto recuperado |
 | POST | `/audio/stt` | Transcribe audio a texto (Whisper) |
 | GET | `/audio/tts?q=` | Sintetiza texto a audio (mlx-audio) |
@@ -344,6 +365,7 @@ Alexandria consume ~50MB de código. Es el proyecto más ligero orientado a auto
 - [x] Imágenes inline en artículos (figcaption, galería, lightbox)
 - [x] Mapas offline (PMTiles + MapLibre GL, un solo archivo HTML)
 - [x] Indexación incremental (watch mode con watchdog, re-index automático de content/)
+- [x] Lector de ebooks Markdown (usa el mismo content/ que artículos, navegación por capítulos)
 
 
 
@@ -351,7 +373,7 @@ Alexandria consume ~50MB de código. Es el proyecto más ligero orientado a auto
 - [ ] Exportar / importar base (zip: .db + content/)
 - [ ] Métricas de calidad de artículos (completitud, enlaces internos)
 - [ ] UI mejorada: dark mode, búsqueda avanzada, render de markdown
-- [ ] Lector de ebooks Markdown (usa el mismo content/ que artículos)
+- [x] Lector de ebooks Markdown (usa el mismo content/ que artículos, navegación por capítulos)
 - [ ] CLI de gestión (`alexandria-cli` para ingestar, exportar, diagnosticar)
 - [ ] Script de upgrade: `curl | bash` para actualizar desde GitHub
 - [ ] Sync de contenido via filesystem (copiar carpeta content/ por USB)
