@@ -1,3 +1,11 @@
+![Offline First](https://img.shields.io/badge/Offline%20First-Sí-ff6b00?style=for-the-badge)
+![Privacidad](https://img.shields.io/badge/Privacidad-Total-2f855a?style=for-the-badge)
+![IA Local](https://img.shields.io/badge/IA%20Local-Sí-7c3aed?style=for-the-badge)
+![Base de Conocimiento](https://img.shields.io/badge/Base%20de%20Conocimiento-SQLite%20%2B%20FTS5-2563eb?style=for-the-badge)
+![LLM](https://img.shields.io/badge/LLM-Ollama-0ea5e9?style=for-the-badge)
+![Stack](https://img.shields.io/badge/Backend-FastAPI%20%2B%20Python-22c55e?style=for-the-badge)
+![Hardware](https://img.shields.io/badge/Hardware-Raspberry%20Pi%20%2F%20PC-f97316?style=for-the-badge)
+
 # Alexandria
 
 > *La memoria de la humanidad, preservada offline.*
