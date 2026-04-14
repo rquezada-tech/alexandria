@@ -10,7 +10,7 @@
 <div align="center">
 
 ![Estado](https://img.shields.io/badge/Estado-Desarrollo-ff6b00?style=flat-square&labelColor=374151)
-![Versión](https://img.shields.io/badge/Versión-0.7.2-2563eb?style=flat-square&labelColor=374151)
+![Versión](https://img.shields.io/badge/Versión-0.7.3-2563eb?style=flat-square&labelColor=374151)
 ![Paradigma](https://img.shields.io/badge/Paradigma-Offline%20First-f97316?style=flat-square&labelColor=374151)
 ![IA](https://img.shields.io/badge/IA-Ollama%20%2B%20Voz%20Offline-7c3aed?style=flat-square&labelColor=374151)
 ![Hardware](https://img.shields.io/badge/Hardware-Raspberry%20Pi%20%2F%20PC-ec4899?style=flat-square&labelColor=374151)
@@ -335,8 +335,6 @@ Alexandria consume ~50MB de código. Es el proyecto más ligero orientado a auto
 - [x] 125,000+ artículos de Wikipedia ingestados
 - [x] Dockerización (un solo comando)
 
-### En progreso
-- [ ] Indexación incremental (watch mode con inotify/FSEvents)
 ### Completado
 - [x] Pipeline de descarga masiva de Wikipedia (ZIM)
 - [x] 125,000+ artículos de Wikipedia ingestados
@@ -345,6 +343,7 @@ Alexandria consume ~50MB de código. Es el proyecto más ligero orientado a auto
 - [x] Frontend con interfaz de voz (micrófono + altavoz)
 - [x] Imágenes inline en artículos (figcaption, galería, lightbox)
 - [x] Mapas offline (PMTiles + MapLibre GL, un solo archivo HTML)
+- [x] Indexación incremental (watch mode con watchdog, re-index automático de content/)
 
 
 
