@@ -24,7 +24,7 @@
 
 Alexandria es una base de conocimiento offline con inteligencia artificial local. Inspirada en la legendaria Biblioteca de Alejandría, permite consultar textos sobre supervivencia, medicina básica, historia, herramientas, electrónica y más — sin necesidad de conexión a Internet.
 
-**Alexandria responde preguntas usando una base de conocimiento local y un modelo de lenguaje que corre en tu hardware. No envía datos a ninguna nube. Todo funciona offline.**
+**Alexandria responde preguntas usando una base de conocimiento local y un modelo de lenguaje que corre en tu hardware. No envía datos a ninguna nube. Todo funciona offline. También puede escucharte y responderte por voz — sin necesidad de internet ni servicios cloud.**
 
 Está diseñada para:
 - **Situaciones de emergencia** donde no hay Internet
@@ -139,6 +139,28 @@ services:
     image: tainer
 ```
 
+
+
+### Por voz
+
+Alexandria puede escucharte y responderte con voz offline:
+
+```bash
+# STT: graba tu voz y convierte a texto
+whisper --model medium mi_pregunta.wav
+
+# TTS: convierte texto a audio (mlx-audio + Kokoro-82M)
+alexandria-cli speak "Cómo purifico agua en caso de emergencia"
+```
+
+Endpoints de audio en la API:
+
+| Método | Endpoint | Descripción |
+|---|---|---|
+| POST | `/audio/stt` | Recibe audio WAV/MP3, retorna texto |
+| GET | `/audio/tts?q=` | Recibe texto, retorna audio WAV |
+
+Requerimientos: `whisper` (STT) y `mlx-audio` (TTS) instalados localmente.
 
 ## Uso
 
@@ -273,6 +295,8 @@ Alexandria consume ~50MB de código Python. N.O.M.A.D. requiere ~7GB de herramie
 - [x] Dockerización (un solo comando)
 
 ### En progreso
+- [ ] Audio: voz → texto (STT) con Whisper + interfaz de micrófono
+- [ ] Audio: texto → voz (TTS) con mlx-audio + Kokoro-82M
 - [ ] Imágenes inline en artículos (figcaption, galerías ligeras)
 - [ ] Mapas offline (PMTiles + MapLibre GL, un solo archivo HTML)
 - [ ] Indexación incremental (watch mode con inotify/FSEvents)
