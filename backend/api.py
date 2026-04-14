@@ -3,6 +3,7 @@ Alexandria - API FastAPI
 Endpoints para búsqueda, chat, administración y audio (STT + TTS)
 """
 import os
+import re
 import sys
 import uuid
 from pathlib import Path
@@ -43,7 +44,7 @@ PORT = int(os.getenv("ALEXANDRIA_PORT", "8080"))
 OLLAMA_BASE = os.getenv("OLLAMA_BASE", "http://localhost:11434")
 
 # ── App ─────────────────────────────────────────────────
-app = FastAPI(title="Alexandria API", version="0.2.0")
+app = FastAPI(title="Alexandria API", version="0.3.0")
 
 app.add_middleware(
     CORSMiddleware,
@@ -130,6 +131,50 @@ def select_model() -> str:
         return "qwen2.5:3b"
 
 
+# ── Imágenes de un artículo ───────────────────────────────
+def extract_images_from_markdown(source: str) -> list[dict]:
+    """
+    Dado un source path relativo (ej: medicina/primeros-auxilios/heridas.md),
+    busca en la misma carpeta imágenes compatibles (jpg, png, gif, webp, svg)
+    que podrían estar referenciadas en el markdown.
+    """
+    # El source viene como "domain/subtopic/article.md"
+    # Buscamos imágenes junto al .md o en subcarpetas images/
+    source_path = CONTENT_DIR / source
+    if not source_path.exists():
+        source_path = CONTENT_DIR / source.replace("/", os.sep)
+    if not source_path.exists():
+        return []
+
+    article_dir = source_path.parent
+    images = []
+
+    # Buscar imágenes en la carpeta del artículo
+    for pattern in ["*.jpg", "*.jpeg", "*.png", "*.gif", "*.webp", "*.svg"]:
+        for img_path in article_dir.glob(pattern):
+            # Relativo a CONTENT_DIR para URL
+            rel_path = img_path.relative_to(CONTENT_DIR)
+            images.append({
+                "filename": img_path.name,
+                "url": f"/content-images/{rel_path.as_posix()}",
+                "alt": img_path.stem.replace("_", " ").replace("-", " "),
+            })
+
+    # Buscar en subcarpeta images/
+    images_dir = article_dir / "images"
+    if images_dir.exists():
+        for pattern in ["*.jpg", "*.jpeg", "*.png", "*.gif", "*.webp", "*.svg"]:
+            for img_path in images_dir.glob(pattern):
+                rel_path = img_path.relative_to(CONTENT_DIR)
+                images.append({
+                    "filename": img_path.name,
+                    "url": f"/content-images/{rel_path.as_posix()}",
+                    "alt": img_path.stem.replace("_", " ").replace("-", " "),
+                })
+
+    return images
+
+
 # ── Endpoints: Estado ───────────────────────────────────
 @app.on_event("startup")
 def startup():
@@ -140,7 +185,7 @@ def startup():
 def health():
     return {
         "status": "ok",
-        "version": "0.2.0",
+        "version": "0.3.0",
         "audio": {
             "stt_available": is_whisper_available(),
             "tts_available": is_mlx_audio_available(),
@@ -205,6 +250,17 @@ def get_content(content_id: int):
         "has_images": content.has_images,
         "chunks_count": content.total_chunks,
     }
+
+
+@app.get("/content/{content_id}/images")
+def get_content_images(content_id: int):
+    """Retorna las imágenes asociadas a un artículo."""
+    content = get_content_by_id(content_id)
+    if not content:
+        raise HTTPException(status_code=404, detail="Contenido no encontrado")
+
+    images = extract_images_from_markdown(content.source)
+    return {"content_id": content_id, "images": images}
 
 
 # ── Endpoints: Chat ─────────────────────────────────────
@@ -279,19 +335,13 @@ async def audio_stt(
     audio: UploadFile = File(...),
     language: str = Form(default="es"),
 ):
-    """
-    Recibe un archivo de audio (WAV, MP3, M4A, OGG, FLAC)
-    y retorna la transcripción de texto.
-
-    Requiere: whisper instalado y modelo descargado.
-    """
+    """Recibe audio y retorna la transcripción de texto."""
     if not is_whisper_available():
         raise HTTPException(
             status_code=503,
             detail="Whisper no está instalado. Instálalo con: brew install whisper",
         )
 
-    # Leer audio
     try:
         audio_bytes = await audio.read()
     except Exception as e:
@@ -300,7 +350,6 @@ async def audio_stt(
     if len(audio_bytes) == 0:
         raise HTTPException(status_code=400, detail="Archivo de audio vacío.")
 
-    # Limite: 50MB
     if len(audio_bytes) > 50 * 1024 * 1024:
         raise HTTPException(status_code=400, detail="Archivo de audio muy grande (máx 50MB).")
 
@@ -313,11 +362,7 @@ async def audio_stt(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error en transcripción: {e}")
 
-    return {
-        "text": text,
-        "language": language,
-        "filename": filename,
-    }
+    return {"text": text, "language": language, "filename": filename}
 
 
 @app.get("/audio/tts")
@@ -325,18 +370,11 @@ def audio_tts(
     q: str = Query(..., min_length=1, max_length=2000),
     voice: str = Query(default=None),
 ):
-    """
-    Recibe texto y retorna audio WAV con voz sintetizada.
-
-    Requiere: mlx-audio instalado con Kokoro-82M.
-    """
+    """Recibe texto y retorna audio WAV con voz sintetizada."""
     if not is_mlx_audio_available():
         raise HTTPException(
             status_code=503,
-            detail=(
-                "mlx-audio no está instalado. Instálalo desde:\n"
-                "  https://github.com/lucasnewman/mlx-audio"
-            ),
+            detail="mlx-audio no está instalado. Instálalo desde:\n  https://github.com/lucasnewman/mlx-audio",
         )
 
     active_voice = voice or os.getenv("TTS_VOICE", "af_heart")
@@ -352,7 +390,7 @@ def audio_tts(
         content=wav_bytes,
         media_type="audio/wav",
         headers={
-            "Content-Disposition": f'attachment; filename="alexandria_voice.wav"',
+            "Content-Disposition": 'attachment; filename="alexandria_voice.wav"',
             "X-Voice": active_voice,
         },
     )
@@ -376,7 +414,7 @@ def audio_capabilities():
     }
 
 
-# ── Frontend estático ───────────────────────────────────
+# ── Static: Frontend + Contenido ────────────────────────
 frontend_dir = sys_path / "frontend"
 if frontend_dir.exists():
     @app.get("/")
@@ -387,6 +425,10 @@ if frontend_dir.exists():
         raise HTTPException(status_code=404, detail="Frontend no encontrado")
 
     app.mount("/static", StaticFiles(directory=str(frontend_dir)), name="static")
+
+# Servir imágenes del contenido (artículos pueden tener imágenes)
+if CONTENT_DIR.exists():
+    app.mount("/content-images", StaticFiles(directory=str(CONTENT_DIR)), name="content-images")
 
 
 # ── Entry point ──────────────────────────────────────────
