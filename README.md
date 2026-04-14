@@ -10,7 +10,7 @@
 <div align="center">
 
 ![Estado](https://img.shields.io/badge/Estado-Desarrollo-ff6b00?style=flat-square&labelColor=374151)
-![Versión](https://img.shields.io/badge/Versión-0.7.0-2563eb?style=flat-square&labelColor=374151)
+![Versión](https://img.shields.io/badge/Versión-0.7.1-2563eb?style=flat-square&labelColor=374151)
 ![Paradigma](https://img.shields.io/badge/Paradigma-Offline%20First-f97316?style=flat-square&labelColor=374151)
 ![IA](https://img.shields.io/badge/IA-Ollama%20%2B%20Voz%20Offline-7c3aed?style=flat-square&labelColor=374151)
 ![Hardware](https://img.shields.io/badge/Hardware-Raspberry%20Pi%20%2F%20PC-ec4899?style=flat-square&labelColor=374151)
@@ -209,6 +209,7 @@ Alexandria expone una API REST en `http://localhost:8080`:
 | GET | `/stats` | Estadísticas de la base |
 | GET | `/search?q=&domain=&limit=` | Búsqueda full-text |
 | GET | `/content/<id>` | Contenido completo de un artículo |
+| GET | `/content/<id>/images` | Imágenes asociadas al artículo |
 | POST | `/chat` | Chat con contexto recuperado |
 | POST | `/audio/stt` | Transcribe audio a texto (Whisper) |
 | GET | `/audio/tts?q=` | Sintetiza texto a audio (mlx-audio) |
@@ -305,7 +306,6 @@ Alexandria consume ~50MB de código. Es el proyecto más ligero orientado a auto
 - [x] Dockerización (un solo comando)
 
 ### En progreso
-- [ ] Imágenes inline en artículos (figcaption, galerías ligeras)
 - [ ] Mapas offline (PMTiles + MapLibre GL, un solo archivo HTML)
 - [ ] Indexación incremental (watch mode con inotify/FSEvents)
 ### Completado
@@ -314,6 +314,7 @@ Alexandria consume ~50MB de código. Es el proyecto más ligero orientado a auto
 - [x] Dockerización (un solo comando)
 - [x] Voz offline (STT con Whisper + TTS con mlx-audio)
 - [x] Frontend con interfaz de voz (micrófono + altavoz)
+- [x] Imágenes inline en artículos (figcaption, galería, lightbox)
 
 
 
