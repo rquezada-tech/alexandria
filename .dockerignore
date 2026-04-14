@@ -1,0 +1,53 @@
+# Alexandria - .dockerignore
+# Lo que NO se incluye en el contexto de build de Docker
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Base de datos SQLite (generado en runtime)
+*.db
+*.db-journal
+
+# Contenido (se monta como volumen)
+content/
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Git
+.git/
+.gitignore
+
+# Docker (no tiene sentido incluirlo en el contexto)
+Dockerfile
+docker-compose*.yml
+.dockerignore
+docker-entrypoint.sh
+
+# README y docs
+README.md
+ARCHITECTURE.md
+
+# Frontend build (se copia directamente, no excluir dist si existe)
+# frontend/dist/
+
+# Imágenes pesadas del repo
+logo_alexandria.png
+logo.svg
