@@ -10,9 +10,9 @@
 <div align="center">
 
 ![Estado](https://img.shields.io/badge/Estado-Desarrollo-ff6b00?style=flat-square&labelColor=374151)
-![Versión](https://img.shields.io/badge/Versión-0.6.0-2563eb?style=flat-square&labelColor=374151)
+![Versión](https://img.shields.io/badge/Versión-0.7.0-2563eb?style=flat-square&labelColor=374151)
 ![Paradigma](https://img.shields.io/badge/Paradigma-Offline%20First-f97316?style=flat-square&labelColor=374151)
-![IA](https://img.shields.io/badge/IA-Local%20(Llamafile/Ollama)-7c3aed?style=flat-square&labelColor=374151)
+![IA](https://img.shields.io/badge/IA-Ollama%20%2B%20Voz%20Offline-7c3aed?style=flat-square&labelColor=374151)
 ![Hardware](https://img.shields.io/badge/Hardware-Raspberry%20Pi%20%2F%20PC-ec4899?style=flat-square&labelColor=374151)
 ![RAM](https://img.shields.io/badge/RAM-4GB%20mín.-22c55e?style=flat-square&labelColor=374151)
 ![Stack](https://img.shields.io/badge/Stack-Python%20%2B%20SQLite%20%2B%20FastAPI-0ea5e9?style=flat-square&labelColor=374151)
@@ -51,6 +51,8 @@ El contenido se alimenta desde Wikipedia vía dumps ZIM y artículos Markdown pr
 - **Python 3.10+**
 - **Ollama** corriendo en `localhost:11434`
 - **4GB RAM mínimo** (para modelos pequeños como `qwen2.5:3b`)
+- **Whisper** (opcional, para control por voz): `brew install whisper`
+- **mlx-audio** (opcional, para síntesis de voz): `brew install mlx-audio`
 
 Ollama puede instalar modelos automáticamente, pero puedes especificar el que prefieras.
 
@@ -146,11 +148,12 @@ services:
 Alexandria puede escucharte y responderte con voz offline:
 
 ```bash
-# STT: graba tu voz y convierte a texto
-whisper --model medium mi_pregunta.wav
+# STT: graba tu voz desde la interfaz web (botón 🎤)
+# TTS: presiona 🔊 en cualquier respuesta del Bibliotecario
 
-# TTS: convierte texto a audio (mlx-audio + Kokoro-82M)
-alexandria-cli speak "Cómo purifico agua en caso de emergencia"
+# También via API:
+curl -X POST http://localhost:8080/audio/stt -F "audio=@pregunta.wav"
+curl "http://localhost:8080/audio/tts?q=C%C3%B3mo%20purifico%20agua"
 ```
 
 Endpoints de audio en la API:
@@ -207,6 +210,8 @@ Alexandria expone una API REST en `http://localhost:8080`:
 | GET | `/search?q=&domain=&limit=` | Búsqueda full-text |
 | GET | `/content/<id>` | Contenido completo de un artículo |
 | POST | `/chat` | Chat con contexto recuperado |
+| POST | `/audio/stt` | Transcribe audio a texto (Whisper) |
+| GET | `/audio/tts?q=` | Sintetiza texto a audio (mlx-audio) |
 
 Ejemplo de chat:
 
@@ -239,7 +244,8 @@ Modelos compatibles con Ollama:
 alexandria/
 ├── backend/
 │   ├── db.py          # Schema SQLite FTS5 + helpers
-│   ├── api.py         # FastAPI (endpoints REST)
+│   ├── api.py         # FastAPI (endpoints REST + audio STT/TTS)
+│   ├── audio.py       # Módulo de audio: Whisper (STT) + mlx-audio (TTS)
 │   └── ingest.py      # Script de ingestión de contenido
 ├── content/           # Carpeta de conocimiento (Markdown)
 │   ├── medicina/
@@ -299,11 +305,17 @@ Alexandria consume ~50MB de código. Es el proyecto más ligero orientado a auto
 - [x] Dockerización (un solo comando)
 
 ### En progreso
-- [ ] Audio: voz → texto (STT) con Whisper + interfaz de micrófono
-- [ ] Audio: texto → voz (TTS) con mlx-audio + Kokoro-82M
 - [ ] Imágenes inline en artículos (figcaption, galerías ligeras)
 - [ ] Mapas offline (PMTiles + MapLibre GL, un solo archivo HTML)
 - [ ] Indexación incremental (watch mode con inotify/FSEvents)
+### Completado
+- [x] Pipeline de descarga masiva de Wikipedia (ZIM)
+- [x] 125,000+ artículos de Wikipedia ingestados
+- [x] Dockerización (un solo comando)
+- [x] Voz offline (STT con Whisper + TTS con mlx-audio)
+- [x] Frontend con interfaz de voz (micrófono + altavoz)
+
+
 
 ### Próximos
 - [ ] Exportar / importar base (zip: .db + content/)
