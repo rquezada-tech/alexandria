@@ -1,0 +1,157 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 480" font-family="sans-serif">
+  <rect width="800" height="480" fill="#fafafa"/>
+
+  <!-- Title -->
+  <text x="400" y="28" text-anchor="middle" font-size="16" font-weight="bold" fill="#1a1a2e">SEÑALES DE RESCATE — Ground-to-Air (ITU) y Manuales</text>
+
+  <!-- V = Require Assistance -->
+  <g transform="translate(40,55)">
+    <rect x="-5" y="-5" width="110" height="110" fill="#f0f0f0" stroke="#333" stroke-width="2"/>
+    <text x="50" y="18" text-anchor="middle" font-size="10" fill="#333">V = Necesito asistencia</text>
+    <!-- V shape -->
+    <line x1="10" y1="25" x2="25" y2="95" stroke="#1a1a2e" stroke-width="4"/>
+    <line x1="25" y1="95" x2="40" y2="25" stroke="#1a1a2e" stroke-width="4"/>
+    <line x1="55" y1="25" x2="70" y2="95" stroke="#1a1a2e" stroke-width="4"/>
+    <line x1="70" y1="95" x2="85" y2="25" stroke="#1a1a2e" stroke-width="4"/>
+    <text x="50" y="120" text-anchor="middle" font-size="14" font-weight="bold" fill="#f85149">V</text>
+  </g>
+
+  <!-- X = Unable to proceed -->
+  <g transform="translate(170,55)">
+    <rect x="-5" y="-5" width="110" height="110" fill="#f0f0f0" stroke="#333" stroke-width="2"/>
+    <text x="50" y="18" text-anchor="middle" font-size="10" fill="#333">X = No puedo avanzar</text>
+    <line x1="15" y1="25" x2="85" y2="95" stroke="#1a1a2e" stroke-width="4"/>
+    <line x1="85" y1="25" x2="15" y2="95" stroke="#1a1a2e" stroke-width="4"/>
+    <text x="50" y="120" text-anchor="middle" font-size="14" font-weight="bold" fill="#f85149">X</text>
+  </g>
+
+  <!-- K = Require medical assistance -->
+  <g transform="translate(300,55)">
+    <rect x="-5" y="-5" width="110" height="110" fill="#f0f0f0" stroke="#333" stroke-width="2"/>
+    <text x="50" y="18" text-anchor="middle" font-size="10" fill="#333">K = Necesito médico</text>
+    <line x1="50" y1="25" x2="50" y2="95" stroke="#1a1a2e" stroke-width="4"/>
+    <line x1="15" y1="55" x2="85" y2="55" stroke="#1a1a2e" stroke-width="4"/>
+    <line x1="50" y1="55" x2="15" y2="25" stroke="#1a1a2e" stroke-width="4"/>
+    <line x1="50" y1="55" x2="85" y2="25" stroke="#1a1a2e" stroke-width="4"/>
+    <text x="50" y="120" text-anchor="middle" font-size="14" font-weight="bold" fill="#f85149">K</text>
+  </g>
+
+  <!-- L = Pointing direction -->
+  <g transform="translate(430,55)">
+    <rect x="-5" y="-5" width="110" height="110" fill="#f0f0f0" stroke="#333" stroke-width="2"/>
+    <text x="50" y="18" text-anchor="middle" font-size="10" fill="#333">L = Indica dirección</text>
+    <line x1="15" y1="85" x2="85" y2="85" stroke="#1a1a2e" stroke-width="4"/>
+    <line x1="15" y1="85" x2="35" y2="55" stroke="#1a1a2e" stroke-width="4"/>
+    <line x1="35" y1="55" x2="25" y2="40" stroke="#1a1a2e" stroke-width="4"/>
+    <line x1="35" y1="55" x2="45" y2="40" stroke="#1a1a2e" stroke-width="4"/>
+    <text x="50" y="120" text-anchor="middle" font-size="14" font-weight="bold" fill="#3fb950">L</text>
+  </g>
+
+  <!-- F = Request food -->
+  <g transform="translate(560,55)">
+    <rect x="-5" y="-5" width="110" height="110" fill="#f0f0f0" stroke="#333" stroke-width="2"/>
+    <text x="50" y="18" text-anchor="middle" font-size="10" fill="#333">F = Necesito alimento</text>
+    <line x1="15" y1="25" x2="85" y2="25" stroke="#1a1a2e" stroke-width="4"/>
+    <line x1="25" y1="25" x2="25" y2="95" stroke="#1a1a2e" stroke-width="4"/>
+    <line x1="75" y1="25" x2="75" y2="95" stroke="#1a1a2e" stroke-width="4"/>
+    <line x1="15" y1="60" x2="85" y2="60" stroke="#1a1a2e" stroke-width="4"/>
+    <text x="50" y="120" text-anchor="middle" font-size="14" font-weight="bold" fill="#f85149">F</text>
+  </g>
+
+  <!-- Y / slash = proceed this way -->
+  <g transform="translate(690,55)">
+    <rect x="-5" y="-5" width="110" height="110" fill="#f0f0f0" stroke="#333" stroke-width="2"/>
+    <text x="50" y="18" text-anchor="middle" font-size="10" fill="#333">/ = Avanza por aquí</text>
+    <line x1="50" y1="25" x2="50" y2="95" stroke="#1a1a2e" stroke-width="4"/>
+    <line x1="20" y1="60" x2="80" y2="25" stroke="#1a1a2e" stroke-width="4"/>
+    <line x1="20" y1="60" x2="80" y2="95" stroke="#1a1a2e" stroke-width="4"/>
+    <text x="50" y="120" text-anchor="middle" font-size="14" font-weight="bold" fill="#3fb950">/</text>
+  </g>
+
+  <!-- Distress signals section -->
+  <g transform="translate(30,195)">
+    <rect x="-5" y="-5" width="740" height="120" fill="rgba(248,81,73,0.05)" stroke="#f85149" stroke-width="1.5" rx="8"/>
+    <text x="365" y="0" text-anchor="middle" font-size="12" font-weight="bold" fill="#f85149">SEÑAL UNIVERSAL DE DISTRESS: 3 (TRES) — Repetir</text>
+
+    <!-- 3 fires in triangle -->
+    <g transform="translate(80,60)">
+      <!-- Fire 1 top -->
+      <ellipse cx="0" cy="0" rx="12" ry="16" fill="#e25822" opacity="0.9"/>
+      <ellipse cx="0" cy="-4" rx="7" ry="10" fill="#f0c040"/>
+      <!-- Fire 2 bottom left -->
+      <ellipse cx="-40" cy="45" rx="12" ry="16" fill="#e25822" opacity="0.9"/>
+      <ellipse cx="-40" cy="41" rx="7" ry="10" fill="#f0c040"/>
+      <!-- Fire 3 bottom right -->
+      <ellipse cx="40" cy="45" rx="12" ry="16" fill="#e25822" opacity="0.9"/>
+      <ellipse cx="40" cy="41" rx="7" ry="10" fill="#f0c040"/>
+      <text x="0" y="80" text-anchor="middle" font-size="10" fill="#333">3 fuegos en triángulo</text>
+      <text x="0" y="93" text-anchor="middle" font-size="9" fill="#8b949e">(visible de día y noche)</text>
+    </g>
+
+    <!-- Smoke -->
+    <g transform="translate(230,30)">
+      <text x="0" y="0" font-size="11" font-weight="bold" fill="#333">DÍA: Humo</text>
+      <text x="0" y="18" font-size="10" fill="#444">Humo BLANCO = necesito</text>
+      <text x="0" y="33" font-size="10" fill="#444">Humo NARANJA o negro = peligro</text>
+      <text x="0" y="50" font-size="9" fill="#8b949e">Agregar piedra húmeda</text>
+      <text x="0" y="63" font-size="9" fill="#8b949e">o plástico sobre el fuego</text>
+    </g>
+
+    <!-- Whistle -->
+    <g transform="translate(400,30)">
+      <text x="0" y="0" font-size="11" font-weight="bold" fill="#333">SILBIDO: 3 cortos</text>
+      <text x="0" y="18" font-size="10" fill="#444">... ... ... (pausa) ... ... ...</text>
+      <text x="0" y="33" font-size="10" fill="#444">3 silbidos cortos = AYUDA</text>
+      <text x="0" y="48" font-size="9" fill="#8b949e">Silbato de emergencia:</text>
+      <text x="0" y="61" font-size="9" fill="#8b949e">130+ dB audible a 1-2km</text>
+    </g>
+
+    <!-- Mirror -->
+    <g transform="translate(560,30)">
+      <text x="0" y="0" font-size="11" font-weight="bold" fill="#333">ESPEJO: destellos</text>
+      <rect x="0" y="10" width="40" height="40" fill="#d4f0ff" stroke="#aaa" stroke-width="1"/>
+      <line x1="0" y1="10" x2="40" y2="50" stroke="#8ab" stroke-width="1"/>
+      <line x1="40" y1="10" x2="0" y2="50" stroke="#8ab" stroke-width="1"/>
+      <text x="50" y="25" font-size="9" fill="#444">Reflectar hacia</text>
+      <text x="50" y="38" font-size="9" fill="#444">aviones con zigzag</text>
+      <text x="50" y="51" font-size="9" fill="#8b949e">visible hasta 10km</text>
+    </g>
+  </g>
+
+  <!-- Morse code quick reference -->
+  <g transform="translate(30,335)">
+    <rect x="-5" y="-5" width="740" height="130" fill="#f8f8f8" stroke="#333" stroke-width="1.5" rx="8"/>
+    <text x="365" y="0" text-anchor="middle" font-size="12" font-weight="bold" fill="#1a1a2e">ALFABETO MORSE — Rescue Essentials</text>
+
+    <!-- SOS -->
+    <g transform="translate(60,25)">
+      <text x="0" y="0" font-size="11" font-weight="bold" fill="#f85149">SOS = ... --- ...</text>
+      <text x="0" y="16" font-size="9" fill="#444">3 cortos · 3 largos · 3 cortos</text>
+      <text x="0" y="30" font-size="9" fill="#f85149">Señal de peligro máxima</text>
+    </g>
+
+    <!-- Help -->
+    <g transform="translate(230,25)">
+      <text x="0" y="0" font-size="11" font-weight="bold" fill="#3fb950">HELP = .... . .-.. .--.</text>
+      <text x="0" y="16" font-size="9" fill="#444">4 cortos · 1 largo · 2 cortos · 1 largo · 2 cortos</text>
+      <text x="0" y="30" font-size="9" fill="#3fb950">Solicitar ayuda</text>
+    </g>
+
+    <!-- OK -->
+    <g transform="translate(400,25)">
+      <text x="0" y="0" font-size="11" font-weight="bold" fill="#2563eb">OK = --- -.-</text>
+      <text x="0" y="16" font-size="9" fill="#444">3 largos · 1 corto · 1 largo · 1 corto</text>
+      <text x="0" y="30" font-size="9" fill="#2563eb">Estoy bien / Todo OK</text>
+    </g>
+
+    <!-- Water -->
+    <g transform="translate(560,25)">
+      <text x="0" y="0" font-size="11" font-weight="bold" fill="#0ea5e9">WATER = .-- .- - . .-.</text>
+      <text x="0" y="16" font-size="9" fill="#444">2 cortos-largo · 1 corto · 2 largos · 1 corto · 2 largos</text>
+      <text x="0" y="30" font-size="9" fill="#0ea5e9">Necesito agua</text>
+    </g>
+
+    <!-- Manual signaling rule -->
+    <text x="0" y="70" font-size="10" fill="#333">Regla: . (punto) = 1 segundo de destello/abajo. - (raya) = 3 segundos. Espacio entre = 1 segundo. Espacio entre letras = 3 segundos.</text>
+  </g>
+</svg>

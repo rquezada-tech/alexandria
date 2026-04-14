@@ -2,8 +2,12 @@
 title: Señales de Rescate y Comunicación de Emergencia
 domain: supervivencia
 subtopic: senales-y-comunicacion
-has_images: false
+has_images: true
 ---
+
+```
+//images/senales-rescate.svg
+```
 
 # Señales DE RESCATE Y COMUNICACIÓN DE EMERGENCIA
 

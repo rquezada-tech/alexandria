@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" font-family="sans-serif">
+  <rect width="800" height="500" fill="#fafafa"/>
+
+  <!-- Title -->
+  <text x="400" y="28" text-anchor="middle" font-size="16" font-weight="bold" fill="#1a1a2e">NUDOS DE UNIÓN — Bends (juntar dos cuerdas)</text>
+
+  <!-- Sheet Bend -->
+  <g transform="translate(80,60)">
+    <rect x="-10" y="-10" width="170" height="130" fill="none" stroke="#ccc" stroke-width="1"/>
+    <text x="75" y="135" text-anchor="middle" font-size="12" fill="#555">5. Sheet Bend (Cola de Golondrina)</text>
+    <!-- Rope 1 (thicker) -->
+    <path d="M 10 30 C 30 30 50 40 65 50 C 80 60 90 70 90 70" fill="none" stroke="#8B4513" stroke-width="6" stroke-linecap="round"/>
+    <!-- Rope 2 (thinner) - going under and over -->
+    <path d="M 90 70 C 85 60 75 50 65 50 C 55 50 55 55 55 60 L 40 75" fill="none" stroke="#a0522d" stroke-width="4" stroke-linecap="round"/>
+    <!-- The key crossing point -->
+    <circle cx="65" cy="50" r="6" fill="none" stroke="#c9a227" stroke-width="2"/>
+    <text x="105" y="45" font-size="9" fill="#c9a227">bucle</text>
+    <!-- Labels -->
+    <text x="0" y="20" font-size="9" fill="#8B4513">cuerda gruesa</text>
+    <text x="90" y="85" font-size="9" fill="#a0522d">cuerda delgada</text>
+    <path d="M 65 50 L 90 70" stroke="#c9a227" stroke-width="1.5" stroke-dasharray="3,2"/>
+    <text x="100" y="100" font-size="9" fill="#c9a227">la cuerda DELGADA</text>
+    <text x="100" y="112" font-size="9" fill="#c9a227">hace el bucle</text>
+  </g>
+
+  <!-- Double Sheet Bend -->
+  <g transform="translate(310,60)">
+    <rect x="-10" y="-10" width="170" height="130" fill="none" stroke="#ccc" stroke-width="1"/>
+    <text x="75" y="135" text-anchor="middle" font-size="12" fill="#555">6. Double Sheet Bend (Reforzado)</text>
+    <!-- Rope 1 -->
+    <path d="M 10 30 C 30 30 50 40 65 50 C 80 60 90 70 90 70" fill="none" stroke="#8B4513" stroke-width="6" stroke-linecap="round"/>
+    <!-- Rope 2 - two wraps -->
+    <path d="M 90 70 C 82 60 72 52 65 50 C 58 50 55 55 52 62 L 38 80" fill="none" stroke="#a0522d" stroke-width="4" stroke-linecap="round"/>
+    <path d="M 52 62 L 55 55" fill="none" stroke="#a0522d" stroke-width="4" stroke-linecap="round"/>
+    <!-- Two loops -->
+    <circle cx="65" cy="50" r="5" fill="none" stroke="#c9a227" stroke-width="2"/>
+    <circle cx="55" cy="55" r="4" fill="none" stroke="#c9a227" stroke-width="2"/>
+    <text x="100" y="100" font-size="9" fill="#c9a227">dos国人</text>
+  </g>
+
+  <!-- Carrick Bend -->
+  <g transform="translate(550,60)">
+    <rect x="-10" y="-10" width="170" height="130" fill="none" stroke="#ccc" stroke-width="1"/>
+    <text x="75" y="135" text-anchor="middle" font-size="12" fill="#555">7. Carrick Bend (Cabo Maritime)</text>
+    <!-- Rope A -->
+    <path d="M 20 20 Q 50 20 70 40 Q 90 60 70 80 Q 50 100 30 80 Q 10 60 30 40" fill="none" stroke="#8B4513" stroke-width="5" stroke-linecap="round"/>
+    <!-- Rope B -->
+    <path d="M 20 80 Q 50 80 70 60 Q 90 40 70 20 Q 50 0 30 20 Q 10 40 30 60" fill="none" stroke="#a0522d" stroke-width="5" stroke-linecap="round"/>
+    <!-- Crossings -->
+    <circle cx="50" cy="50" r="8" fill="none" stroke="#c9a227" stroke-width="2"/>
+    <text x="75" y="50" font-size="9" fill="#c9a227">cruz</text>
+    <text x="10" y="130" font-size="9" fill="#555">Para cuerdas gruesas; no se atasca</text>
+  </g>
+
+  <!-- Note -->
+  <g transform="translate(30,220)">
+    <text x="0" y="0" font-size="11" font-weight="bold" fill="#1a1a2e">Regla de oro — Sheet Bend:</text>
+    <text x="0" y="18" font-size="10" fill="#444">"La cuerda DELGADA forma el bucle, la GRUESA pasa por dentro"</text>
+    <text x="0" y="36" font-size="10" fill="#444">Si inviertes, el nudo puede aflojarse bajo carga.</text>
+    <text x="0" y="54" font-size="10" fill="#444">Carrick Bend: preferido en navegación porque no se atasca con cuerdas húmedas.</text>
+  </g>
+</svg>

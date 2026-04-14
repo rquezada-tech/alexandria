@@ -1,0 +1,115 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 520" font-family="sans-serif">
+  <rect width="800" height="520" fill="#fafafa"/>
+
+  <!-- Title -->
+  <text x="400" y="28" text-anchor="middle" font-size="16" font-weight="bold" fill="#1a1a2e">NUDOS DE LAZO — Loops ( ASL para asegurar, arrests, rappel)</text>
+
+  <!-- Figure-8 Knot -->
+  <g transform="translate(70,55)">
+    <rect x="-5" y="-10" width="140" height="115" fill="none" stroke="#ccc" stroke-width="1"/>
+    <text x="65" y="118" text-anchor="middle" font-size="11" fill="#555">8. Figure-8 (Cola de Ocho)</text>
+    <!-- Rope entering -->
+    <path d="M 10 55 L 30 55" stroke="#8B4513" stroke-width="5" stroke-linecap="round"/>
+    <!-- Figure 8 loop -->
+    <path d="M 30 55 C 50 55 60 40 50 30 C 40 20 25 20 25 35 C 25 50 40 50 40 55" fill="none" stroke="#8B4513" stroke-width="5" stroke-linecap="round"/>
+    <!-- Exit -->
+    <path d="M 40 55 L 60 55" stroke="#8B4513" stroke-width="5" stroke-linecap="round"/>
+    <!-- Loop -->
+    <circle cx="37" cy="37" r="14" fill="none" stroke="#c9a227" stroke-width="1.5" stroke-dasharray="4,2"/>
+    <text x="100" y="50" font-size="9" fill="#c9a227">bucle</text>
+    <text x="80" y="70" font-size="9" fill="#2563eb">no se atasca</text>
+  </g>
+
+  <!-- Bowline -->
+  <g transform="translate(270,55)">
+    <rect x="-5" y="-10" width="170" height="115" fill="none" stroke="#ccc" stroke-width="1"/>
+    <text x="80" y="118" text-anchor="middle" font-size="11" fill="#555">9. Bowline (Lazo Fijo)</text>
+    <!-- Tree/anchor -->
+    <rect x="10" y="30" width="12" height="60" fill="#8B6914" rx="3"/>
+    <text x="0" y="100" font-size="9" fill="#8B6914">árbol</text>
+    <!-- Rope: standing end -->
+    <path d="M 70 30 L 70 55" stroke="#8B4513" stroke-width="5" stroke-linecap="round"/>
+    <!-- Around tree -->
+    <path d="M 70 55 C 55 55 45 50 40 40 L 40 30 C 40 15 55 10 70 10 L 100 10" fill="none" stroke="#8B4513" stroke-width="5" stroke-linecap="round"/>
+    <!-- The loop around the standing end -->
+    <path d="M 70 10 C 80 10 85 20 85 35 C 85 50 75 55 65 55 L 55 55" fill="none" stroke="#8B4513" stroke-width="5" stroke-linecap="round"/>
+    <!-- Working end going through -->
+    <path d="M 55 55 L 55 65 L 70 55" fill="none" stroke="#8B4513" stroke-width="5" stroke-linecap="round"/>
+    <!-- Labels -->
+    <text x="105" y="10" font-size="9" fill="#555">cola</text>
+    <text x="75" y="25" font-size="9" fill="#c9a227">bucle</text>
+    <text x="0" y="25" font-size="9" fill="#555">trama</text>
+    <!-- Numbered steps -->
+    <circle cx="70" cy="10" r="8" fill="#c9a227"/>
+    <text x="70" y="14" text-anchor="middle" font-size="9" fill="white" font-weight="bold">1</text>
+    <circle cx="85" cy="35" r="8" fill="#c9a227"/>
+    <text x="85" y="39" text-anchor="middle" font-size="9" fill="white" font-weight="bold">2</text>
+    <circle cx="55" cy="55" r="8" fill="#c9a227"/>
+    <text x="55" y="59" text-anchor="middle" font-size="9" fill="white" font-weight="bold">3</text>
+  </g>
+
+  <!-- Bowline on a bight -->
+  <g transform="translate(510,55)">
+    <rect x="-5" y="-10" width="170" height="115" fill="none" stroke="#ccc" stroke-width="1"/>
+    <text x="80" y="118" text-anchor="middle" font-size="11" fill="#555">10. Bowline on a Bight (Lazo Doble)</text>
+    <!-- Tree -->
+    <rect x="10" y="30" width="12" height="60" fill="#8B6914" rx="3"/>
+    <!-- Rope doubled -->
+    <path d="M 70 30 L 70 55 M 90 30 L 90 55" stroke="#8B4513" stroke-width="5" stroke-linecap="round"/>
+    <!-- Both around tree -->
+    <path d="M 70 55 C 50 55 40 50 35 35 C 35 20 50 10 70 10 L 110 10" fill="none" stroke="#8B4513" stroke-width="5" stroke-linecap="round"/>
+    <path d="M 90 55 C 70 55 60 50 55 35 C 55 20 70 10 90 10 L 110 10" fill="none" stroke="#8B4513" stroke-width="5" stroke-linecap="round"/>
+    <!-- Loop through -->
+    <path d="M 70 55 C 80 55 85 65 85 75 L 70 75 L 70 55" fill="none" stroke="#8B4513" stroke-width="5" stroke-linecap="round"/>
+    <circle cx="77" cy="65" r="5" fill="none" stroke="#c9a227" stroke-width="1.5"/>
+    <text x="120" y="70" font-size="9" fill="#c9a227">dos bucles</text>
+    <text x="30" y="100" font-size="9" fill="#555">para rappel rápido</text>
+  </g>
+
+  <!-- Alpine Butterfly -->
+  <g transform="translate(60,210)">
+    <rect x="-5" y="-10" width="160" height="115" fill="none" stroke="#ccc" stroke-width="1"/>
+    <text x="75" y="118" text-anchor="middle" font-size="11" fill="#555">11. Alpine Butterfly (Mariposa)</text>
+    <!-- Rope -->
+    <path d="M 10 55 L 40 55" stroke="#8B4513" stroke-width="5" stroke-linecap="round"/>
+    <!-- Loop formed -->
+    <path d="M 40 55 C 55 55 65 45 75 35 C 85 25 95 35 105 35 C 115 35 115 55 115 55" fill="none" stroke="#8B4513" stroke-width="5" stroke-linecap="round"/>
+    <path d="M 105 35 C 95 35 85 25 75 35 C 65 45 55 55 40 55" fill="none" stroke="#8B4513" stroke-width="5" stroke-linecap="round"/>
+    <!-- Exit -->
+    <path d="M 115 55 L 145 55" stroke="#8B4513" stroke-width="5" stroke-linecap="round"/>
+    <!-- Loop highlight -->
+    <circle cx="75" cy="40" r="12" fill="rgba(201,162,39,0.15)" stroke="#c9a227" stroke-width="1.5"/>
+    <text x="95" y="20" font-size="9" fill="#c9a227">loop central</text>
+    <text x="20" y="45" font-size="9" fill="#555">entrada</text>
+    <text x="120" y="45" font-size="9" fill="#555">salida</text>
+  </g>
+
+  <!-- Prusik -->
+  <g transform="translate(300,210)">
+    <rect x="-5" y="-10" width="170" height="115" fill="none" stroke="#ccc" stroke-width="1"/>
+    <text x="80" y="118" text-anchor="middle" font-size="11" fill="#555">12. Prusik (Ascensor)</text>
+    <!-- Main rope -->
+    <path d="M 10 30 L 155 30" stroke="#555" stroke-width="8" stroke-linecap="round"/>
+    <path d="M 10 55 L 155 55" stroke="#555" stroke-width="8" stroke-linecap="round"/>
+    <!-- Prusik loop rope wrapped -->
+    <path d="M 60 10 C 60 30 55 40 60 45 C 65 50 75 50 80 45 C 85 40 85 30 80 20" fill="none" stroke="#8B4513" stroke-width="4" stroke-linecap="round"/>
+    <path d="M 60 45 L 60 10" fill="none" stroke="#8B4513" stroke-width="4" stroke-linecap="round"/>
+    <!-- Contact points highlighted -->
+    <circle cx="68" cy="40" r="5" fill="none" stroke="#c9a227" stroke-width="2"/>
+    <circle cx="75" cy="38" r="5" fill="none" stroke="#c9a227" stroke-width="2"/>
+    <text x="100" y="35" font-size="9" fill="#c9a227">se agarra</text>
+    <text x="100" y="47" font-size="9" fill="#c9a227">a la cuerda</text>
+    <text x="0" y="95" font-size="9" fill="#555">Sube por la cuerda bajo peso</text>
+    <text x="0" y="108" font-size="9" fill="#555">y se desliza con las manos</text>
+  </g>
+
+  <!-- Key properties -->
+  <g transform="translate(500,210)">
+    <text x="0" y="0" font-size="11" font-weight="bold" fill="#1a1a2e">Propiedades:</text>
+    <text x="0" y="18" font-size="10" fill="#444">• Figure-8: fácil de deshacer, no se atasca</text>
+    <text x="0" y="33" font-size="10" fill="#444">• Bowline: NO se aprieta bajo carga, fácil de soltar</text>
+    <text x="0" y="48" font-size="10" fill="#444">• Alpine Butterfly: loop en medio de cuerda sin tocar extremos</text>
+    <text x="0" y="63" font-size="10" fill="#444">• Prusik: ascensor que sube con peso, baja con manos</text>
+    <text x="0" y="78" font-size="10" fill="#c9a227">CUIDADO: nunca confíes en un nudo sin probar primero</text>
+  </g>
+</svg>

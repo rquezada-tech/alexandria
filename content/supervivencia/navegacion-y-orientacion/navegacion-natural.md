@@ -2,8 +2,12 @@
 title: Navegación y Orientación sin Brújula
 domain: supervivencia
 subtopic: navegacion-y-orientacion
-has_images: false
+has_images: true
 ---
+
+```
+//images/navegacion-estrellas.svg
+```
 
 ## Introducción
 
@@ -24,6 +28,10 @@ El Sol ejecuta un movimiento aparente de este a oeste debido a la rotación terr
 En el hemisferio sur, el Sol alcanza su punto más alto al norte. En el hemisferio norte, alcanza su punto más alto al sur. Este dato es crítico y frecuentemente invertido en la memoria.
 
 ### Método del palo (gnomon)
+
+```
+//images/navegacion-sombra.svg
+```
 
 El método del gnomon es la forma más antigua y sencilla de determinar la dirección norte-sur usando el Sol.
 

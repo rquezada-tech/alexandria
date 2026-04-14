@@ -2,12 +2,16 @@
 title: Purificación de Agua en Campo
 domain: supervivencia
 subtopic: agua-y-alimentacion
-has_images: false
+has_images: true
 ---
 
 # Purificación de Agua en Campo
 
 El agua es esencial para la supervivencia. Un ser humano puede sobrevivir semanas sin comida, pero solo unos pocos días sin agua. Sin embargo, el agua contaminada es una de las principales causas de enfermedad y muerte en situaciones de emergencia.
+
+```
+//images/agua-purificacion.svg
+```
 
 ## Peligros del agua no tratada
 

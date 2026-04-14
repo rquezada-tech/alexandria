@@ -2,7 +2,7 @@
 title: Construir un Refugio — Guía Completa de Shelter de Emergencia
 domain: supervivencia
 subtopic: refugio
-has_images: false
+has_images: true
 ---
 
 # Construir un Refugio — Guía Completa de Shelter de Emergencia
@@ -27,6 +27,10 @@ Antes de construir, evaluar:
 - **Visibilidad**: En zona de rescue, hacer el shelter visible pero no tan expuesto como para atraer attention unwanted.
 
 ## Tipos de shelter
+
+```
+//images/refugio-tipos.svg
+```
 
 ### Debris Hut (Refugio deramo)
 

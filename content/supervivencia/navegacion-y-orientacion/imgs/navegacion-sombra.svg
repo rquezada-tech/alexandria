@@ -1,0 +1,103 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" font-family="sans-serif">
+  <rect width="800" height="400" fill="#0a0a1a"/>
+
+  <!-- Title -->
+  <text x="400" y="28" text-anchor="middle" font-size="16" font-weight="bold" fill="#e8c547">MÉTODO DEL PALO (GNOMON) — Orientación por el sol</text>
+
+  <!-- Shadow Stick Step 1 -->
+  <g transform="translate(50,60)">
+    <text x="100" y="0" text-anchor="middle" font-size="11" fill="#8b949e">PASO 1: Clava un palo vertical en el suelo</text>
+
+    <!-- Ground -->
+    <line x1="0" y1="120" x2="200" y2="120" stroke="#4a4a4a" stroke-width="2"/>
+
+    <!-- Stick -->
+    <line x1="100" y1="50" x2="100" y2="120" stroke="#8B6914" stroke-width="5" stroke-linecap="round"/>
+    <circle cx="100" cy="50" r="5" fill="#8B6914"/>
+
+    <!-- First shadow -->
+    <line x1="100" y1="50" x2="145" y2="120" stroke="#3fb950" stroke-width="2" stroke-dasharray="6,3"/>
+    <text x="155" y="100" font-size="10" fill="#3fb950">sombra</text>
+
+    <!-- N marker -->
+    <text x="30" y="105" font-size="12" fill="#e8c547">N</text>
+  </g>
+
+  <!-- Shadow Stick Step 2 -->
+  <g transform="translate(280,60)">
+    <text x="100" y="0" text-anchor="middle" font-size="11" fill="#8b949e">PASO 2: Marca la punta de la sombra (A)</text>
+
+    <!-- Ground -->
+    <line x1="0" y1="120" x2="200" y2="120" stroke="#4a4a4a" stroke-width="2"/>
+
+    <!-- Stick -->
+    <line x1="100" y1="50" x2="100" y2="120" stroke="#8B6914" stroke-width="5" stroke-linecap="round"/>
+    <circle cx="100" cy="50" r="5" fill="#8B6914"/>
+
+    <!-- Shadow with A marker -->
+    <line x1="100" y1="50" x2="155" y2="120" stroke="#3fb950" stroke-width="2"/>
+    <circle cx="155" cy="120" r="4" fill="#c9a227"/>
+    <text x="165" y="115" font-size="12" font-weight="bold" fill="#c9a227">A</text>
+
+    <!-- Stone marker -->
+    <ellipse cx="155" cy="122" rx="8" ry="4" fill="#888"/>
+
+    <text x="100" y="150" text-anchor="middle" font-size="10" fill="#e6edf3">Marca la punta exacta de la sombra</text>
+  </g>
+
+  <!-- Shadow Stick Step 3 -->
+  <g transform="translate(510,60)">
+    <text x="100" y="0" text-anchor="middle" font-size="11" fill="#8b949e">PASO 3: Espera 30-60 min, marca punto B</text>
+
+    <!-- Ground -->
+    <line x1="0" y1="120" x2="200" y2="120" stroke="#4a4a4a" stroke-width="2"/>
+
+    <!-- Stick -->
+    <line x1="100" y1="50" x2="100" y2="120" stroke="#8B6914" stroke-width="5" stroke-linecap="round"/>
+    <circle cx="100" cy="50" r="5" fill="#8B6914"/>
+
+    <!-- Shadow A (faded) -->
+    <line x1="100" y1="50" x2="155" y2="120" stroke="#3fb950" stroke-width="1.5" opacity="0.4"/>
+    <circle cx="155" cy="120" r="3" fill="#666"/>
+    <text x="165" y="115" font-size="11" fill="#666">A</text>
+
+    <!-- Shadow B (new, current) -->
+    <line x1="100" y1="50" x2="60" y2="120" stroke="#3fb950" stroke-width="2"/>
+    <circle cx="60" cy="120" r="4" fill="#c9a227"/>
+    <text x="68" y="115" font-size="12" font-weight="bold" fill="#c9a227">B</text>
+
+    <ellipse cx="60" cy="122" rx="8" ry="4" fill="#888"/>
+  </g>
+
+  <!-- Final: draw east-west line -->
+  <g transform="translate(50,240)">
+    <rect x="-10" y="-15" width="700" height="120" fill="none" stroke="#c9a227" stroke-width="1.5" rx="8"/>
+    <text x="340" y="0" text-anchor="middle" font-size="12" font-weight="bold" fill="#c9a227">PASO 4: Traza la línea A→B (es el eje ESTE→OESTE)</text>
+
+    <!-- Ground -->
+    <line x1="0" y1="80" x2="700" y2="80" stroke="#4a4a4a" stroke-width="1"/>
+
+    <!-- A marker -->
+    <circle cx="200" cy="80" r="5" fill="#c9a227"/>
+    <text x="200" y="68" text-anchor="middle" font-size="14" font-weight="bold" fill="#c9a227">A</text>
+
+    <!-- B marker -->
+    <circle cx="500" cy="80" r="5" fill="#c9a227"/>
+    <text x="500" y="68" text-anchor="middle" font-size="14" font-weight="bold" fill="#c9a227">B</text>
+
+    <!-- E-W line -->
+    <line x1="200" y1="80" x2="500" y2="80" stroke="#c9a227" stroke-width="3"/>
+    <text x="200" y="98" text-anchor="middle" font-size="10" fill="#3fb950">OESTE</text>
+    <text x="500" y="98" text-anchor="middle" font-size="10" fill="#3fb950">ESTE</text>
+
+    <!-- N-S perpendicular -->
+    <line x1="350" y1="30" x2="350" y2="80" stroke="#e8c547" stroke-width="2" stroke-dasharray="5,3"/>
+    <line x1="350" y1="80" x2="350" y2="110" stroke="#e8c547" stroke-width="2" stroke-dasharray="5,3"/>
+    <text x="350" y="22" text-anchor="middle" font-size="10" fill="#e8c547">NORTE</text>
+
+    <!-- Explanation -->
+    <text x="350" y="130" text-anchor="middle" font-size="10" fill="#8b949e">El sol se mueve de Este a Oeste. La sombra se mueve de Oeste a Este.</text>
+    <text x="350" y="148" text-anchor="middle" font-size="10" fill="#8b949e">Entonces B es el ESTE. La línea A→B apunta Este→Oeste.</text>
+    <text x="350" y="166" text-anchor="middle" font-size="11" font-weight="bold" fill="#c9a227">Perpendicular a A→B = Norte→Sur</text>
+  </g>
+</svg>

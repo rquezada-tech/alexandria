@@ -1,0 +1,106 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 420" font-family="sans-serif">
+  <rect width="800" height="420" fill="#fafafa"/>
+
+  <!-- Title -->
+  <text x="400" y="28" text-anchor="middle" font-size="16" font-weight="bold" fill="#1a1a2e">IDENTIFICACIÓN DE SERPIENTES VENENOSAS — América Latina</text>
+  <text x="400" y="46" text-anchor="middle" font-size="11" fill="#f85149">La mejor prevención: no las toques. Si te muerden → NO HAGAS NADA de lo que parece lógico</text>
+
+  <!-- Bothrops (Crucera/Terciopelo) -->
+  <g transform="translate(40,70)">
+    <rect x="-10" y="-10" width="220" height="160" fill="none" stroke="#f85149" stroke-width="2" rx="8"/>
+    <text x="100" y="5" text-anchor="middle" font-size="13" font-weight="bold" fill="#f85149">Bothrops (Crucera / Terciopelo)</text>
+
+    <!-- Snake head triangular -->
+    <path d="M 50 120 Q 30 90 40 70 Q 50 50 100 50 Q 150 50 160 70 Q 170 90 150 120 Z" fill="#8B7355" stroke="#5a4a32" stroke-width="2"/>
+    <!-- Eye with vertical pupil -->
+    <ellipse cx="90" cy="75" rx="8" ry="10" fill="#f0c040"/>
+    <ellipse cx="90" cy="75" rx="2" ry="8" fill="#1a1a1a"/>
+    <!-- Heat pits -->
+    <ellipse cx="75" cy="70" rx="4" ry="3" fill="#3a2a1a"/>
+    <ellipse cx="105" cy="70" rx="4" ry="3" fill="#3a2a1a"/>
+    <!-- Neck -->
+    <path d="M 60 120 Q 70 135 100 135 Q 130 135 140 120" fill="#8B7355"/>
+
+    <!-- Labels -->
+    <text x="100" y="150" text-anchor="middle" font-size="10" fill="#444">Cabeza TRIANGULAR</text>
+    <text x="100" y="163" text-anchor="middle" font-size="10" fill="#444">Ojo REDONDO con pupila vertical</text>
+    <text x="100" y="176" text-anchor="middle" font-size="10" fill="#f85149">Pozo loreal (calor) visible</text>
+
+    <!-- Distribution badge -->
+    <text x="10" y="195" font-size="9" fill="#8b949e">Distribución: Centro y Sudamérica</text>
+  </g>
+
+  <!-- Crotalus (Cascabel) -->
+  <g transform="translate(290,70)">
+    <rect x="-10" y="-10" width="220" height="160" fill="none" stroke="#f85149" stroke-width="2" rx="8"/>
+    <text x="100" y="5" text-anchor="middle" font-size="13" font-weight="bold" fill="#f85149">Crotalus (Cascabel)</text>
+
+    <!-- Snake head diamond -->
+    <path d="M 50 120 Q 35 95 45 75 Q 55 55 100 50 Q 145 55 155 75 Q 165 95 150 120 Z" fill="#9B7653" stroke="#5a4532" stroke-width="2"/>
+    <!-- Big eye -->
+    <ellipse cx="90" cy="72" rx="10" ry="12" fill="#f0c040"/>
+    <ellipse cx="90" cy="72" rx="2.5" ry="10" fill="#1a1a1a"/>
+    <!-- Rattle suggestion -->
+    <circle cx="100" cy="140" r="10" fill="#9B7653" stroke="#5a4532" stroke-width="1"/>
+    <circle cx="100" cy="128" r="8" fill="#9B7653" stroke="#5a4532" stroke-width="1"/>
+    <circle cx="100" cy="117" r="6" fill="#9B7653" stroke="#5a4532" stroke-width="1"/>
+    <path d="M 100 107 Q 95 100 100 95 Q 105 100 100 107" fill="#9B7653" stroke="#5a4532" stroke-width="1"/>
+    <text x="100" y="165" text-anchor="middle" font-size="10" fill="#c9a227">¡ cascabel !</text>
+
+    <!-- Labels -->
+    <text x="100" y="183" text-anchor="middle" font-size="10" fill="#444">Ojo con pupila ELÁSTICA</text>
+    <text x="100" y="196" text-anchor="middle" font-size="10" fill="#444">Carece de pozo loreal</text>
+
+    <text x="10" y="210" font-size="9" fill="#8b949e">Distribución: Americas (desérticas y templadas)</text>
+  </g>
+
+  <!-- Micrurus (Coral) -->
+  <g transform="translate(540,70)">
+    <rect x="-10" y="-10" width="220" height="160" fill="none" stroke="#f85149" stroke-width="2" rx="8"/>
+    <text x="100" y="5" text-anchor="middle" font-size="13" font-weight="bold" fill="#f85149">Micrurus (Coral) — MUY VENENOSA</text>
+
+    <!-- Coral head - ROUND (key difference) -->
+    <path d="M 50 120 Q 30 105 35 85 Q 45 65 100 65 Q 155 65 165 85 Q 170 105 150 120 Z" fill="#e74c3c" stroke="#c0392b" stroke-width="2"/>
+    <!-- Eyes - round pupils -->
+    <circle cx="80" cy="82" r="7" fill="#f0c040"/>
+    <circle cx="80" cy="82" r="5" fill="#1a1a1a"/>
+    <circle cx="120" cy="82" r="7" fill="#f0c040"/>
+    <circle cx="120" cy="82" r="5" fill="#1a1a1a"/>
+
+    <!-- Bands -->
+    <path d="M 65 85 Q 100 80 135 85" stroke="#f0e050" stroke-width="4" fill="none"/>
+    <path d="M 70 100 Q 100 96 130 100" stroke="#1a1a1a" stroke-width="4" fill="none"/>
+
+    <!-- Neck -->
+    <path d="M 60 120 Q 75 132 100 132 Q 125 132 140 120" fill="#e74c3c"/>
+
+    <!-- Labels -->
+    <text x="100" y="150" text-anchor="middle" font-size="11" font-weight="bold" fill="#f85149">⚠ Cabeza REDONDA (NO triangular)</text>
+    <text x="100" y="166" text-anchor="middle" font-size="10" fill="#444">Ojos REDONDOS con pupila circular</text>
+    <text x="100" y="179" text-anchor="middle" font-size="10" fill="#444">Colores: ROJO + AMARILLO + NEGRO</text>
+
+    <!-- Coral vs False coral -->
+    <text x="10" y="195" font-size="9" fill="#8b949e">Distribución: América Latina tropical</text>
+  </g>
+
+  <!-- CORAL FALSA (no venenosa) -->
+  <g transform="translate(290,280)">
+    <rect x="-10" y="-10" width="220" height="90" fill="none" stroke="#3fb950" stroke-width="2" rx="8"/>
+    <text x="100" y="5" text-anchor="middle" font-size="12" font-weight="bold" fill="#3fb950">CORAL FALSA (No venenosa)</text>
+
+    <text x="100" y="22" text-anchor="middle" font-size="10" fill="#444">Mismo patrón rojo/amarillo/negro PERO:</text>
+    <text x="100" y="38" text-anchor="middle" font-size="10" font-weight="bold" fill="#3fb950">ROJO toca NEGRO (no amarillo)</text>
+    <text x="100" y="54" text-anchor="middle" font-size="9" fill="#8b949e">Secuencia: Rojo → Negro → Amarillo → Negro → Rojo</text>
+    <text x="100" y="68" text-anchor="middle" font-size="9" fill="#8b949e">Secuencia CORAL REAL: Rojo → Amarillo → Negro → Amarillo → Rojo</text>
+  </g>
+
+  <!-- What NOT to do -->
+  <g transform="translate(540,280)">
+    <rect x="-10" y="-10" width="220" height="90" fill="rgba(248,81,73,0.1)" stroke="#f85149" stroke-width="2" rx="8"/>
+    <text x="100" y="5" text-anchor="middle" font-size="12" font-weight="bold" fill="#f85149">ANTE MUERTEDEURA: LO QUE NO HACER</text>
+    <text x="0" y="22" font-size="10" fill="#f85149">✗ NO succionar el veneno</text>
+    <text x="0" y="38" font-size="10" fill="#f85149">✗ NO cortar en cruz</text>
+    <text x="0" y="54" font-size="10" fill="#f85149">✗ NO aplicar torniquete</text>
+    <text x="0" y="70" font-size="10" fill="#f85149">✗ NO aplicar hielo directamente</text>
+  </g>
+</svg>
