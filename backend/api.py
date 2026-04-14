@@ -44,7 +44,7 @@ PORT = int(os.getenv("ALEXANDRIA_PORT", "8080"))
 OLLAMA_BASE = os.getenv("OLLAMA_BASE", "http://localhost:11434")
 
 # ── App ─────────────────────────────────────────────────
-app = FastAPI(title="Alexandria API", version="0.3.0")
+app = FastAPI(title="Alexandria API", version="0.3.1")
 
 app.add_middleware(
     CORSMiddleware,
@@ -185,7 +185,7 @@ def startup():
 def health():
     return {
         "status": "ok",
-        "version": "0.3.0",
+        "version": "0.3.1",
         "audio": {
             "stt_available": is_whisper_available(),
             "tts_available": is_mlx_audio_available(),
@@ -412,6 +412,47 @@ def audio_capabilities():
             "voices": list_tts_voices(),
         },
     }
+
+
+# ── Mapas offline ──────────────────────────────────────
+MAPS_DIR = sys_path / "data" / "maps"
+
+AVAILABLE_MAPS = [
+    {"id": "world", "label": "Mundo", "file": "world.pmtiles", "note": "Mapa mundial (baja resolución)"},
+    {"id": "sudamerica", "label": "Sudamérica", "file": "sudamerica.pmtiles", "note": "Cobertura completa"},
+    {"id": "chile", "label": "Chile", "file": "chile.pmtiles", "note": "Chile continental + insular"},
+    {"id": "latam", "label": "Latinoamérica", "file": "latam.pmtiles", "note": "México a Argentina"},
+    {"id": "europa", "label": "Europa", "file": "europa.pmtiles", "note": "Continente europeo"},
+]
+
+
+@app.get("/maps")
+def serve_maps():
+    """Sirve el visualizador de mapas offline."""
+    maps_html = sys_path / "frontend" / "maps.html"
+    if not maps_html.exists():
+        raise HTTPException(status_code=404, detail="Maps viewer no encontrado")
+    return FileResponse(str(maps_html))
+
+
+@app.get("/maps/available")
+def list_maps():
+    """Lista los mapas offline disponibles (descargados en data/maps/)."""
+    available = []
+    if MAPS_DIR.exists():
+        for m in AVAILABLE_MAPS:
+            pmtiles_file = MAPS_DIR / m["file"]
+            if pmtiles_file.exists():
+                size_mb = round(pmtiles_file.stat().st_size / (1024 * 1024), 2)
+                available.append({**m, "size_mb": size_mb, "status": "available"})
+            else:
+                available.append({**m, "size_mb": None, "status": "not_downloaded"})
+    return {"maps": available}
+
+
+# Servir archivos PMTiles (mapas offline descargados)
+if MAPS_DIR.exists():
+    app.mount("/data/maps", StaticFiles(directory=str(MAPS_DIR)), name="maps-pmtiles")
 
 
 # ── Static: Frontend + Contenido ────────────────────────

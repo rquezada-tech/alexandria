@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Alexandria — Mapas Offline</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Lora:ital,wght@0,400;0,600&display=swap" rel="stylesheet" />
+  <script src="lib/maplibre-gl.js"></script>
+  <script src="lib/pmtiles.js"></script>
+  <link href="lib/maplibre-gl.css" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0d1117;
+      --surface: #161b22;
+      --surface2: #1c2128;
+      --border: #30363d;
+      --gold: #c9a227;
+      --gold-light: #e8c547;
+      --gold-dim: #a07d1a;
+      --text: #e6edf3;
+      --text-muted: #8b949e;
+      --danger: #f85149;
+      --success: #3fb950;
+    }
+
+    html, body { height: 100%; overflow: hidden; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', system-ui, sans-serif;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Header ── */
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0.6rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-shrink: 0;
+    }
+    .logo-text {
+      font-family: 'Lora', serif;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--gold);
+    }
+    .header-center { flex: 1; display: flex; gap: 0.5rem; align-items: center; }
+    .region-select {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.35rem 0.8rem;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      font-family: inherit;
+      cursor: pointer;
+      outline: none;
+    }
+    .region-select:focus { border-color: var(--gold-dim); }
+    .status-bar {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .status-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--text-muted);
+    }
+    .status-dot.online { background: var(--success); }
+    .status-dot.offline { background: var(--danger); }
+    .back-btn {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 0.3rem 0.8rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      text-decoration: none;
+      transition: all 0.15s;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    .back-btn:hover { color: var(--gold); border-color: var(--gold-dim); }
+
+    /* ── Map ── */
+    #map { flex: 1; width: 100%; }
+
+    /* ── Search overlay ── */
+    .search-overlay {
+      position: absolute;
+      top: 0.6rem;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+      display: flex;
+      gap: 0.4rem;
+    }
+    .map-search-input {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.45rem 1rem;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-family: inherit;
+      width: 280px;
+      outline: none;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+      transition: border-color 0.15s;
+    }
+    .map-search-input:focus { border-color: var(--gold-dim); }
+    .map-search-input::placeholder { color: var(--text-muted); }
+
+    /* ── Attribution override ── */
+    .maplibregl-ctrl-attrib { font-size: 10px !important; }
+    .maplibregl-ctrl-attrib a { color: var(--text-muted) !important; }
+
+    /* ── Navigation controls ── */
+    .maplibregl-ctrl-group {
+      background: var(--surface) !important;
+      border: 1px solid var(--border) !important;
+    }
+    .maplibregl-ctrl-group button {
+      background: var(--surface) !important;
+      color: var(--text) !important;
+      border-color: var(--border) !important;
+    }
+    .maplibregl-ctrl-group button:hover { background: var(--surface2) !important; }
+    .maplibregl-ctrl-group button .maplibregl-ctrl-icon { filter: invert(1); }
+
+    /* ── Offline notice ── */
+    .offline-banner {
+      position: absolute;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.5rem 1rem;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      z-index: 10;
+      pointer-events: none;
+      display: none;
+    }
+    .offline-banner.show { display: block; }
+
+    /* ── MapLibre overrides ── */
+    .maplibregl-popup-content {
+      background: var(--surface) !important;
+      color: var(--text) !important;
+      border: 1px solid var(--border) !important;
+      border-radius: 8px !important;
+      padding: 0.6rem 0.9rem !important;
+      font-family: 'Inter', sans-serif !important;
+      font-size: 0.82rem !important;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.4) !important;
+    }
+    .maplibregl-popup-tip { border-top-color: var(--surface) !important; }
+    .maplibregl-popup-close-button {
+      color: var(--text-muted) !important;
+      font-size: 1rem !important;
+    }
+
+    /* ── Empty state ── */
+    .no-maps {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg);
+      gap: 1rem;
+      z-index: 20;
+    }
+    .no-maps h2 { font-family: 'Lora', serif; color: var(--gold); }
+    .no-maps p { color: var(--text-muted); font-size: 0.9rem; max-width: 400px; text-align: center; }
+    .no-maps code {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      padding: 0.3rem 0.6rem;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      color: var(--gold-light);
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <a href="/" class="back-btn">← Alexandria</a>
+  <div class="header-center">
+    <select class="region-select" id="region-select" onchange="switchRegion(this.value)">
+      <option value="">— Selecciona región —</option>
+    </select>
+    <div class="status-bar">
+      <span class="status-dot" id="status-dot"></span>
+      <span id="status-text">Verificando...</span>
+    </div>
+  </div>
+</header>
+
+<!-- Search -->
+<div class="search-overlay">
+  <input
+    type="text"
+    class="map-search-input"
+    id="map-search"
+    placeholder="Buscar lugar…"
+    onkeydown="if(event.key==='Enter') searchPlace()"
+  />
+</div>
+
+<!-- Map container -->
+<div id="map"></div>
+
+<!-- Offline notice -->
+<div class="offline-banner" id="offline-banner">
+  Modo offline — mapa funcionando sin conexión
+</div>
+
+<script>
+  // ── Configuración ───────────────────────────────────
+  const API_BASE = window.location.origin;
+  const MAPS_DATA = '/data/maps/';
+
+  // Capas disponibles (agregar archivos .pmtiles a data/maps/)
+  // Formato: { id, label, center, zoom, bounds }
+  const AVAILABLE_MAPS = [
+    {
+      id: 'world',
+      label: 'Mundo',
+      center: [-70, -35],
+      zoom: 3,
+      bounds: [[-180, -85], [180, 85]],
+      file: 'world.pmtiles',
+      note: 'Mapa mundial (baja resolución)',
+    },
+    {
+      id: 'sudamerica',
+      label: 'Sudamérica',
+      center: [-60, -20],
+      zoom: 4,
+      bounds: [[-82, -56], [-34, 13]],
+      file: 'sudamerica.pmtiles',
+      note: 'Cobertura completa de Sudamérica',
+    },
+    {
+      id: 'chile',
+      label: 'Chile',
+      center: [-71, -33],
+      zoom: 6,
+      bounds: [[-75.5, -55], [-66, -17.5]],
+      file: 'chile.pmtiles',
+      note: 'Chile continental + insular',
+    },
+    {
+      id: 'latam',
+      label: 'Latinoamérica',
+      center: [-75, 0],
+      zoom: 4,
+      bounds: [[-120, -56], [-32, 33]],
+      file: 'latam.pmtiles',
+      note: 'México a Argentina',
+    },
+    {
+      id: 'europa',
+      label: 'Europa',
+      center: [15, 50],
+      zoom: 5,
+      bounds: [[-30, 25], [70, 80]],
+      file: 'europa.pmtiles',
+      note: 'Continente europeo',
+    },
+  ];
+
+  let map = null;
+  let currentMapId = null;
+
+  // ── Offline detection ───────────────────────────────
+  const offlineBanner = document.getElementById('offline-banner');
+  function updateOnlineStatus() {
+    if (!navigator.onLine) {
+      offlineBanner.classList.add('show');
+      document.getElementById('status-dot').className = 'status-dot offline';
+      document.getElementById('status-text').textContent = 'Offline';
+    } else {
+      offlineBanner.classList.remove('show');
+      document.getElementById('status-dot').className = 'status-dot online';
+      document.getElementById('status-text').textContent = 'Online';
+    }
+  }
+  window.addEventListener('online', updateOnlineStatus);
+  window.addEventListener('offline', updateOnlineStatus);
+  updateOnlineStatus();
+
+  // ── Populate region select ───────────────────────────
+  const select = document.getElementById('region-select');
+  AVAILABLE_MAPS.forEach(m => {
+    const opt = document.createElement('option');
+    opt.value = m.id;
+    opt.textContent = `${m.label} (${m.note})`;
+    select.appendChild(opt);
+  });
+
+  select.addEventListener('change', () => {
+    const region = AVAILABLE_MAPS.find(r => r.id === select.value);
+    if (region) {
+      window.location.hash = region.id;
+      loadRegion(region);
+    }
+  });
+
+  // ── Load PMTiles ───────────────────────────────────
+  async function loadRegion(region) {
+    if (map) {
+      map.remove();
+      map = null;
+    }
+
+    currentMapId = region.id;
+    document.getElementById('status-text').textContent = `Cargando ${region.label}...`;
+
+    const pmtilesUrl = MAPS_DATA + region.file;
+
+    // Verificar si el archivo existe
+    let pmtilesExists = false;
+    try {
+      const r = await fetch(pmtilesUrl, { method: 'HEAD' });
+      pmtilesExists = r.ok;
+    } catch {
+      pmtilesExists = false;
+    }
+
+    if (!pmtilesExists) {
+      document.getElementById('map').innerHTML = `
+        <div class="no-maps">
+          <h2>Mapa no disponible offline</h2>
+          <p>Descarga el mapa de <strong>${region.label}</strong> con:</p>
+          <code>python scripts/download_pmtiles.py --region ${region.id}</code>
+          <p style="margin-top:0.5rem;font-size:0.8rem;">El archivo se guardará en data/maps/${region.file}</p>
+        </div>`;
+      document.getElementById('status-text').textContent = 'Sin mapa offline';
+      return;
+    }
+
+    // Inicializar MapLibre GL con PMTiles
+    const p = new pmtiles.PMTiles(pmtilesUrl);
+
+    map = new maplibregl.Map({
+      container: 'map',
+      style: {
+        version: 8,
+        glyphs: 'https://demotiles.maplibre.org/font/{fontstack}/{range}.pbf',
+        sources: {
+          'pmtiles': {
+            type: 'vector',
+            tiles: [
+              `pmtiles://${pmtilesUrl}/{z}/{x}/{y}`,
+            ],
+            attribution: '© OpenStreetMap contributors | © Protomaps',
+            maxzoom: 14,
+          },
+        },
+        layers: [
+          {
+            id: 'background',
+            type: 'background',
+            paint: { 'background-color': '#1a1a2e' },
+          },
+          {
+            id: 'water',
+            type: 'fill',
+            source: 'pmtiles',
+            'source-layer': 'water',
+            paint: { 'fill-color': '#16213e' },
+          },
+          {
+            id: 'landcover',
+            type: 'fill',
+            source: 'pmtiles',
+            'source-layer': 'landcover',
+            paint: { 'fill-color': '#1b4332', 'fill-opacity': 0.6 },
+          },
+          {
+            id: 'landuse',
+            type: 'fill',
+            source: 'pmtiles',
+            'source-layer': 'landuse',
+            paint: { 'fill-color': '#2d4a22', 'fill-opacity': 0.5 },
+          },
+          {
+            id: 'roads',
+            type: 'line',
+            source: 'pmtiles',
+            'source-layer': 'roads',
+            paint: {
+              'line-color': '#4a4a6a',
+              'line-width': { base: 1.5, stops: [[5, 0.5], [12, 2], [18, 8]] },
+            },
+          },
+          {
+            id: 'roads_major',
+            type: 'line',
+            source: 'pmtiles',
+            'source-layer': 'roads',
+            filter: ['in', ['get', 'class'], ['literal', ['motorway', 'trunk', 'primary']]],
+            paint: {
+              'line-color': '#c9a227',
+              'line-width': { base: 1.5, stops: [[5, 1], [12, 3], [18, 12]] },
+            },
+          },
+          {
+            id: 'boundaries',
+            type: 'line',
+            source: 'pmtiles',
+            'source-layer': 'boundary',
+            paint: { 'line-color': '#c9a227', 'line-width': 0.5, 'line-dasharray': [3, 2] },
+          },
+          {
+            id: 'places',
+            type: 'symbol',
+            source: 'pmtiles',
+            'source-layer': 'places',
+            layout: {
+              'text-field': ['get', 'name'],
+              'text-font': ['Open Sans Regular'],
+              'text-size': { base: 1.5, stops: [[4, 10], [10, 18]] },
+            },
+            paint: {
+              'text-color': '#e8c547',
+              'text-halo-color': '#0d1117',
+              'text-halo-width': 1.5,
+            },
+          },
+          {
+            id: 'transit',
+            type: 'circle',
+            source: 'pmtiles',
+            'source-layer': 'transit',
+            paint: { 'circle-color': '#c9a227', 'circle-radius': 3 },
+          },
+          {
+            id: 'pois',
+            type: 'symbol',
+            source: 'pmtiles',
+            'source-layer': 'pois',
+            layout: {
+              'text-field': ['get', 'name'],
+              'text-font': ['Open Sans Regular'],
+              'text-size': 11,
+            },
+            paint: {
+              'text-color': '#8b949e',
+              'text-halo-color': '#0d1117',
+              'text-halo-width': 1,
+            },
+          },
+        ],
+      },
+      center: region.center,
+      zoom: region.zoom,
+      maxBounds: region.bounds,
+      attributionControl: true,
+    });
+
+    map.addControl(new maplibregl.NavigationControl(), 'top-right');
+
+    map.on('load', () => {
+      document.getElementById('status-text').textContent = navigator.onLine
+        ? `${region.label} — ${pmtilesUrl}`
+        : `${region.label} — Offline`;
+    });
+
+    map.on('error', (e) => {
+      if (e.error && e.error.message && e.error.message.includes('pmtiles')) {
+        console.warn('PMTiles layer error:', e.error.message);
+      }
+    });
+
+    updateOnlineStatus();
+  }
+
+  // ── Search (Nominatim) ─────────────────────────────
+  async function searchPlace() {
+    const q = document.getElementById('map-search').value.trim();
+    if (!q || !map) return;
+
+    document.getElementById('status-text').textContent = `Buscando "${q}"...`;
+
+    try {
+      const r = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&limit=1`,
+        { headers: { 'Accept': 'application/json' } }
+      );
+      const results = await r.json();
+
+      if (results.length === 0) {
+        document.getElementById('status-text').textContent = `Sin resultados para "${q}"`;
+        return;
+      }
+
+      const place = results[0];
+      const lng = parseFloat(place.lon);
+      const lat = parseFloat(place.lat);
+
+      map.flyTo({ center: [lng, lat], zoom: 13, duration: 1500 });
+
+      new maplibregl.Popup({ offset: 15 })
+        .setLngLat([lng, lat])
+        .setHTML(`
+          <strong>${place.display_name.split(',')[0]}</strong><br/>
+          <span style="color:#8b949e;font-size:0.78rem">${place.display_name}</span>
+        `)
+        .addTo(map);
+
+      document.getElementById('status-text').textContent = place.display_name.split(',').slice(0, 2).join(',');
+    } catch (e) {
+      document.getElementById('status-text').textContent = 'Error en búsqueda';
+    }
+  }
+
+  // ── Init: check hash or show prompt ───────────────
+  function init() {
+    const hash = window.location.hash.replace('#', '');
+    if (hash) {
+      const region = AVAILABLE_MAPS.find(r => r.id === hash);
+      if (region) {
+        select.value = region.id;
+        loadRegion(region);
+        return;
+      }
+    }
+
+    // Si hay un solo mapa disponible, cargarlo directamente
+    const firstMap = AVAILABLE_MAPS[0];
+    select.value = firstMap.id;
+    loadRegion(firstMap);
+  }
+
+  init();
+</script>
+</body>
+</html>

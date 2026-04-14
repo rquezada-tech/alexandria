@@ -50,6 +50,12 @@
     .header-right { margin-left: auto; display: flex; align-items: center; gap: 1rem; }
     .model-badge { font-size: 0.75rem; color: var(--text-muted); background: var(--surface2); border: 1px solid var(--border); padding: 0.2rem 0.6rem; border-radius: 20px; }
     .db-stats { font-size: 0.75rem; color: var(--text-muted); }
+    .maps-btn {
+      font-size: 0.78rem; color: var(--text-muted); text-decoration: none;
+      background: var(--surface2); border: 1px solid var(--border);
+      padding: 0.2rem 0.7rem; border-radius: 20px; transition: all 0.15s;
+    }
+    .maps-btn:hover { color: var(--gold); border-color: var(--gold-dim); }
 
     /* ── Layout ── */
     .layout { display: grid; grid-template-columns: 280px 1fr; min-height: calc(100vh - 60px); }
@@ -320,6 +326,9 @@
     </div>
   </div>
   <div class="header-right">
+    <a href="/maps" class="maps-btn" id="maps-btn" title="Mapas offline" style="display:none">
+      🗺️ Mapas
+    </a>
     <span class="model-badge" id="model-badge">—</span>
     <span class="db-stats" id="db-stats">— artículos</span>
   </div>
@@ -385,6 +394,18 @@
       const d = await r.json();
       document.getElementById('db-stats').textContent = `${d.total_articles} artículos · ${d.total_chunks} chunks`;
     } catch { /* offline */ }
+
+    // Check available maps
+    try {
+      const r = await fetch(`${API}/maps/available`);
+      const d = await r.json();
+      const downloaded = (d.maps || []).filter(m => m.status === 'available');
+      const mapsBtn = document.getElementById('maps-btn');
+      if (downloaded.length > 0) {
+        mapsBtn.style.display = '';
+        mapsBtn.textContent = `🗺️ Mapas (${downloaded.length})`;
+      }
+    } catch { /* maps no disponibles */ }
   }
 
   function updateAudioStatus(audio) {
