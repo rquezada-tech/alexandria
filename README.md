@@ -6,6 +6,10 @@
 ![Stack](https://img.shields.io/badge/Backend-FastAPI%20%2B%20Python-22c55e?style=for-the-badge)
 ![Hardware](https://img.shields.io/badge/Hardware-Raspberry%20Pi%20%2F%20PC-f97316?style=for-the-badge)
 
+<p align="center">
+  <img src="https://github.com/rquezada-tech/alexandria/raw/main/logo_alexandria.png" alt="Alexandria Logo" width="340">
+</p>
+
 # Alexandria
 
 > *La memoria de la humanidad, preservada offline.*
